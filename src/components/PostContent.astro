@@ -3,10 +3,10 @@ import Section from './Section.astro';
 import TableOfContents from './TableOfContents.astro';
 ---
 
-<Section>
+<Section class="overflow-x-clip">
 	<div class="relative">
 		<!-- Place TOC in the outer right margin on large screens -->
-		<aside class="hidden lg:block absolute right-[-22rem] top-0 z-10 w-[18rem] h-full">
+		<aside class="hidden lg:block absolute right-[-21rem] top-0 z-10 w-[18rem] h-full">
 			<div class="sticky top-10">
 				<TableOfContents />
 			</div>

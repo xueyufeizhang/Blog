@@ -2,7 +2,9 @@
 import { AppConfig } from '@/utils/AppConfig';
 import Base from '@/layouts/Base.astro';
 import Hero from '@/components/Hero.astro';
+import GitHubContributions from '@/components/GitHubActivityCalendar.astro';
 import LatestPosts from '@/components/LatestPosts.astro';
+import AllTags from '@/components/AllTags.astro';
 import { sortPostsByDate } from '@/utils/data.util';
 import { MarkdownInstance } from 'astro';
 
@@ -18,5 +20,12 @@ const latestPosts = allPosts.slice(0, 3);
 
 <Base head={{ title, description }}>
 	<Hero />
+
+	<div class="flex justify-center items-center my-6 md:mx-2">
+  		<GitHubContributions username="xueyufeizhang" year={new Date().getFullYear()} recentMonths={12} />
+	</div>
+
+	<!-- <GitHubContributions username="xueyufeizhang" year={new Date().getFullYear()} recentMonths={9} /> -->
+	<AllTags />
 	<LatestPosts posts={latestPosts} />
 </Base>
