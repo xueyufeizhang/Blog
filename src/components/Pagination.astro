@@ -13,47 +13,76 @@ const getPath = (p: number) => {
   if (p === 1) return `${baseUrl}/`;
   return `${baseUrl}/${p}`;
 };
+
+// 基础样式类名（参考 Back 按钮）
+const baseBtnClass = "group flex items-center gap-1 rounded-lg border border-gray-300 bg-white/50 px-3 py-1 text-sm text-gray-600 transition-all hover:border-orange-500 hover:text-orange-600 dark:border-stone-700 dark:bg-stone-800/50 dark:text-gray-400 dark:hover:text-orange-400";
+const activeBtnClass = "border-orange-500 text-orange-600 bg-orange-50 dark:bg-orange-950/20 dark:border-orange-400 dark:text-orange-400 font-bold";
 ---
 
 {totalPages > 1 && (
-  <nav class="mt-6 flex items-center justify-center gap-2">
+  <nav class="mt-8 flex items-center justify-center gap-3">
     {/* 上一页按钮 */}
-    {currentPage > 1 && (
-      <a
-        href={getPath(currentPage - 1)}
-        class="px-3 py-1 rounded border hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-      >
-        Prev
+    {currentPage > 1 ? (
+      <a href={getPath(currentPage - 1)} class={baseBtnClass}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="transition-transform group-hover:-translate-x-1"
+        >
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+        <span>Prev</span>
       </a>
+    ) : (
+      /* 禁用状态的占位符（可选） */
+      <span class="px-3 py-1 text-sm text-gray-300 dark:text-gray-600 cursor-not-allowed">Prev</span>
     )}
 
     {/* 页码数字 */}
-    {Array.from({ length: totalPages }).map((_, i) => {
-      const p = i + 1;
-      const isCurrent = p === currentPage;
-      return (
-        <a
-          href={getPath(p)}
-          aria-current={isCurrent ? 'page' : undefined}
-          class={`px-3 py-1 rounded border transition-colors ${
-            isCurrent 
-              ? 'bg-gray-200 dark:bg-gray-700 font-bold' 
-              : 'hover:bg-gray-100 dark:hover:bg-gray-800'
-          }`}
-        >
-          {p}
-        </a>
-      );
-    })}
+    <div class="flex items-center gap-2">
+      {Array.from({ length: totalPages }).map((_, i) => {
+        const p = i + 1;
+        const isCurrent = p === currentPage;
+        return (
+          <a
+            href={getPath(p)}
+            aria-current={isCurrent ? 'page' : undefined}
+            class={`${baseBtnClass} ${isCurrent ? activeBtnClass : ''}`}
+          >
+            {p}
+          </a>
+        );
+      })}
+    </div>
 
     {/* 下一页按钮 */}
-    {currentPage < totalPages && (
-      <a
-        href={getPath(currentPage + 1)}
-        class="px-3 py-1 rounded border hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-      >
-        Next
+    {currentPage < totalPages ? (
+      <a href={getPath(currentPage + 1)} class={baseBtnClass}>
+        <span>Next</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="transition-transform group-hover:translate-x-1"
+        >
+          <path d="m9 18 6-6-6-6" />
+        </svg>
       </a>
+    ) : (
+      <span class="px-3 py-1 text-sm text-gray-300 dark:text-gray-600 cursor-not-allowed">Next</span>
     )}
   </nav>
 )}

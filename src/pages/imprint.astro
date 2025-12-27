@@ -2,46 +2,41 @@
 import Section from '@/components/Section.astro';
 import Base from '@/layouts/Base.astro';
 import { AppConfig } from '@/utils/AppConfig';
+import Heading from '@/components/Heading.astro';
 
 const { title, description } = AppConfig;
 ---
 
 <Base head={{ title: `Legal Notice - ${title}`, description }}>
+
+	<Section><Heading title="Policy" /></Section>
+
 	<Section>
 		<div class="text-sm">
-			<p class="pt-6 text-4xl font-bold">Legal Notice</p>
-
-			<p class="pt-10 pb-4 text-lg font-bold">Mandatory Information (as per Italian D. Lgs. 70/2003)</p>
+			<!-- <p class="pt-6 text-4xl font-bold">Policy</p> -->
+			
+			<p class="pt-0 pb-2 text-2xl font-bold">Mandatory Information (as per Italian D. Lgs. 70/2003)</p>
+			<Section>
 			<p class="space-y-1">
-        <div><strong>Operator:</strong> Xueyufei Zhang</div>
-        <div><strong>Location:</strong> Torino, Italy</div>
-        <div><strong>Email:</strong> <a class="underline hover:text-orange-600" href="mailto:your-email@example.com">contact-me@zxyf.top</a></div>
-        <div><strong>Website URL:</strong> <a class="underline" href={Astro.site}>{Astro.site}</a></div>
-      </p>
+        		<p class="text-lg"><strong>Operator:</strong> Xueyufei Zhang</p>
+        		<p class="text-lg"><strong>Location:</strong> Torino, Italy</p>
+        		<p class="text-lg"><strong>Email:</strong> <a class="underline hover:text-orange-600" href="mailto:your-email@example.com">contact-me@zxyf.top</a></p>
+        		<p class="text-lg"><strong>Website URL:</strong> <a class="underline" href={Astro.site}>{Astro.site}</a></p>
+      		</p>
+			</Section>
 		</div>
 
-		<p class="pt-10 pb-4 text-lg font-bold">Disclaimer</p>
-		<p class="pb-2 font-bold">Content Responsibility</p>
-		<p>
-			The contents of this website have been created with the greatest possible care. However, the author does not guarantee the accuracy, completeness, or timeliness of the information provided. Use of the website content is at the user's own risk.
-		</p>
+		<p class="pt-5 pb-2 text-2xl font-bold">Policy Documentation</p>
 
-		<p class="pt-6 pb-2 font-bold">External Links</p>
-		<p>
-			This website contains links to third-party websites ("external links"). These websites are the sole responsibility of their respective operators. The author has no influence over the current or future design or content of the linked pages.
-		</p>
+		<Section>
+    		<p class="space-y-1">
+        		<p class="text-lg"><a class="underline hover:text-orange-600" href="/privacy"><strong>Privacy Policy</strong></a></p>
+				<p class="py-2"></p>
+        		<p class="text-lg"><a class="underline hover:text-orange-600" href="/terms"><strong>Terms & Conditions</strong></a></p>
+				<p class="py-2"></p>
+				<p class="text-lg"><a class="underline hover:text-orange-600" href="/disclaimer"><strong>Disclaimer</strong></a></p>
+      		</p>
+  		</Section>
 
-		<p class="pt-10 pb-4 text-lg font-bold">Copyright Notice</p>
-		<p>
-			The content published on this website is subject to <strong>Italian Copyright Law (Legge 22 aprile 1941 n. 633)</strong>. Any use not permitted by Italian law requires the prior written consent of the author or the respective rights holder.
-		</p>
-    <p class="pt-4 italic">
-      Unless otherwise specified, <strong>Xueyufei Zhang</strong> is the creator of all original graphics, images, and text.
-    </p>
-
-    <p class="pt-10 pb-4 text-lg font-bold">Privacy and Cookies</p>
-		<p>
-			This site may use third-party services (such as Giscus for comments). For information on how your data is processed, please refer to the respective service providers' privacy policies.
-		</p>
 	</Section>
 </Base>

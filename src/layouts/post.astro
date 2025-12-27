@@ -4,32 +4,31 @@ import Base from '@/layouts/Base.astro';
 import PostHeader from '@/components/PostHeader.astro';
 import PostContent from '@/components/PostContent.astro';
 import Section from '@/components/Section.astro'
-// import DividerText from '@/components/DividerText.astro';
 import GiscusLoader from '@/components/GiscusLoader.astro';
 
 const { description } = AppConfig;
-
 const { frontmatter } = Astro.props;
 ---
 
 <Base head={{ title: frontmatter.title, description }}>
-	<div class="mx-auto w-full max-w-screen-md">
-		<PostHeader
-			title={frontmatter.title}
-			author={frontmatter.author}
-			tags={frontmatter.tags}
-			minutesRead={frontmatter.minutesRead}
-			pubDate={frontmatter.pubDate}
-			isPinned={frontmatter.isPinned}
-			img={{ src: frontmatter.image.src, alt: frontmatter.image.alt }}
-		/>
-		<PostContent><slot /></PostContent>
+	<div class="w-full max-w-screen-xl px-4 lg:ml-30 lg:px-8">
+		<div class="max-w-screen-md">
+			<PostHeader
+				title={frontmatter.title}
+				author={frontmatter.author}
+				tags={frontmatter.tags}
+				minutesRead={frontmatter.minutesRead}
+				pubDate={frontmatter.pubDate}
+				isPinned={frontmatter.isPinned}
+				img={{ src: frontmatter.image.src, alt: frontmatter.image.alt }}
+			/>
+			<PostContent><slot /></PostContent>
 
-		<Section>
-    		<section>
-        		{/* <DividerText text="Loading comments..." /> */}
-        		<GiscusLoader />
-      		</section>
-		</Section>
+			<Section>
+				<section>
+					<GiscusLoader />
+				</section>
+			</Section>
+		</div>
 	</div>
 </Base>

@@ -1,6 +1,7 @@
 ---
 import Footer from '@/components/Footer.astro';
 import Navbar from '@/components/Navbar.astro';
+import Section from '@/components/Section.astro'; // 引入 Section 确保逻辑对齐一致 
 import { AppConfig } from '@/utils/AppConfig';
 import '@/styles/global.css';
 import PostHog from '@/components/posthog.astro';
@@ -15,9 +16,12 @@ export interface Props {
 const {
 	head: { title, description }
 } = Astro.props as Props;
+
+const { pathname } = Astro.url;
+const isHomePage = pathname === "/";
 ---
 
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -37,24 +41,59 @@ const {
 		class="flex min-h-screen flex-col bg-stone-100 font-mono text-gray-950 dark:bg-stone-900 dark:text-white"
 	>
 		<Navbar />
-		<div class="flex-1">
-			<slot />
-		</div>
-		<!-- <div class="flex w-screen flex-row justify-center">
-			<a
-				href="https://3474070726452.gumroad.com/l/astro-resume-01"
-				class="border-input fixed bottom-12 z-100 inline-flex flex-row items-center gap-x-3 rounded-3xl border bg-stone-900 px-10 py-2 text-sm text-stone-100 shadow-sm transition-all hover:scale-105 dark:bg-stone-100 dark:text-stone-900"
-			>
-				<span class="relative flex items-center justify-center">
-					<span
-						class="absolute inline-flex h-2 w-2 animate-ping rounded-full border border-stone-900 bg-stone-900 opacity-75"
-					></span>
-					<span class="relative inline-flex h-2 w-2 rounded-full bg-stone-900"></span>
-				</span>
 
-				<p class="text-lg font-bold">see other templates 🚀</p>
-			</a>
-		</div> -->
+		{
+			!isHomePage && (
+				/* 使用 Section 确保与 About/Post 内容的左边缘像素级对齐 */
+				/* 我们手动覆盖一部分 Section 的默认 margin，让它更紧凑 */
+				<div class="contents"> 
+					<Section>
+						<button
+							onclick="history.back()"
+							class="group mb-0 mt-0 flex w-fit items-center gap-1 rounded-lg border border-gray-300 bg-white/50 px-3 py-1 text-sm text-gray-600 transition-all hover:border-orange-500 hover:text-orange-600 dark:border-stone-700 dark:bg-stone-800/50 dark:text-gray-400 dark:hover:text-orange-400"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="transition-transform group-hover:-translate-x-1"
+							>
+								<path d="m15 18-6-6 6-6" />
+							</svg>
+							<span>Back</span>
+						</button>
+					</Section>
+				</div>
+			)
+		}
+
+		<main class="flex-1">
+			<slot /> 
+		</main>
+
 		<Footer />
 	</body>
 </html>
+
+<style is:global>
+  /* 解决代码块溢出导致的滑动，这是最常见的 Post 页面滑动原因 */
+  pre {
+    max-width: 100%;
+    overflow-x: auto !important;
+  }
+
+  html, body {
+  /* clip 是关键：它剪掉溢出的目录，但不会像 hidden 那样锁死滚动条或破坏 sticky */
+  overflow-x: clip; 
+  width: 100%;
+  }
+
+  /* 核心：确保不破坏 position: sticky (目录跟随) */
+  /* 不要在这里给 body 或 main 加 overflow-x: hidden */
+</style>

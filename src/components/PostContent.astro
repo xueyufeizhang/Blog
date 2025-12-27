@@ -3,30 +3,31 @@ import Section from './Section.astro';
 import TableOfContents from './TableOfContents.astro';
 ---
 
-<Section class="overflow-x-clip">
-	<div class="relative">
-		<!-- Place TOC in the outer right margin on large screens -->
-		<aside class="hidden lg:block absolute right-[-21rem] top-0 z-10 w-[18rem] h-full">
-			<div class="sticky top-10">
-				<TableOfContents />
-			</div>
-		</aside>
-	    <div
-		    class="content prose dark:prose-invert prose-code:rounded-lg prose-code:bg-stone-800 prose-code:p-1 prose-code:text-orange-600 prose-img:rounded-lg prose-img:shadow-xl prose-img:dark:shadow-stone-800 mt-8 max-w-none text-base leading-8 text-black dark:text-white"
-	    >
-		    <slot />
-	    </div>
-	</div>
+<Section>
+  <div class="relative">
+    {/* 关键：使用 2xl 或调整 ml 值。如果屏幕宽度不足以容纳内容+目录，目录必须消失或调整 */}
+    <aside class="hidden xl:block absolute left-[110%] top-0 z-10 w-[18rem] h-full">
+      <div class="sticky top-10">
+        <TableOfContents />
+      </div>
+    </aside>
+    <div
+      class="content prose dark:prose-invert prose-code:rounded-lg prose-code:bg-stone-800 prose-code:p-1 prose-code:text-orange-600 prose-img:rounded-lg prose-img:shadow-xl prose-img:dark:shadow-stone-800 mt-8 max-w-none text-base leading-8 text-black dark:text-white"
+    >
+      <slot />
+    </div>
+  </div>
 </Section>
 
-<!-- Tailwind doesn't fully support some of the complex CSS selectors needed for code highlighting,
-     so we need to keep some custom CSS but applied through Tailwind's plugin system -->
 <style is:global>
-	/* These styles are for code highlighting that can't be easily implemented with just Tailwind */
-
-	/* Ensure anchored headings don't hide under sticky navbar */
-	.content h2,
-	.content h3 {
-		scroll-margin-top: 6rem;
-	}
+  .content h2,
+  .content h3 {
+    scroll-margin-top: 6rem;
+  }
+  /* 强制处理代码块，这是导致左右滑动条的第二大原因 */
+  .content pre {
+    max-width: 100%;
+    overflow-x: auto !important;
+    white-space: pre !important; 
+  }
 </style>
