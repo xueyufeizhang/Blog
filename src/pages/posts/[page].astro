@@ -1,0 +1,59 @@
+---
+import { AppConfig } from '@/utils/AppConfig';
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/Section.astro';
+import Card from '@/components/Card.astro';
+import Heading from '@/components/Heading.astro';
+import Pagination from '@/components/Pagination.astro';
+import { sortPostsByDate } from '@/utils/data.util';
+import type { MarkdownInstance } from 'astro';
+
+// 这里也可以保留一个，供 getStaticPaths 之外的代码使用（虽然此文件其他地方暂未用到）
+// const PER_PAGE = 5;
+
+export async function getStaticPaths() {
+  // 关键点：必须在函数内部重新定义一次
+  const PER_PAGE = 5; 
+
+  const allPosts = Object.values(
+    import.meta.glob('./*.md', { eager: true })
+  ) as MarkdownInstance<any>[];
+  allPosts.sort(sortPostsByDate);
+
+  const totalPages = Math.ceil(allPosts.length / PER_PAGE);
+
+  return Array.from({ length: Math.max(totalPages - 1, 0) }, (_, i) => {
+    const page = i + 2;
+    const start = (page - 1) * PER_PAGE;
+    const end = start + PER_PAGE;
+    return {
+      params: { page: String(page) },
+      props: {
+        page,
+        totalPages,
+        pageData: allPosts.slice(start, end),
+        title: AppConfig.title,
+        description: AppConfig.description,
+      },
+    };
+  });
+}
+
+const { page, totalPages, pageData, title, description } = Astro.props;
+---
+
+<Base head={{ title: `${title} - Page ${page}`, description }}>
+  <Section><Heading title="Posts" /></Section>
+  
+  <Section>
+    {pageData.map((post: any) => (
+      <div class="mb-4 basis-1 last:mb-0">
+        <Card post={post} />
+      </div>
+    ))}
+  </Section>
+
+  <Section>
+    <Pagination currentPage={page} totalPages={totalPages} />
+  </Section>
+</Base>

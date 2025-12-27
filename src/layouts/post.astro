@@ -3,6 +3,9 @@ import { AppConfig } from '@/utils/AppConfig';
 import Base from '@/layouts/Base.astro';
 import PostHeader from '@/components/PostHeader.astro';
 import PostContent from '@/components/PostContent.astro';
+import Section from '@/components/Section.astro'
+// import DividerText from '@/components/DividerText.astro';
+import GiscusLoader from '@/components/GiscusLoader.astro';
 
 const { description } = AppConfig;
 
@@ -21,5 +24,12 @@ const { frontmatter } = Astro.props;
 			img={{ src: frontmatter.image.src, alt: frontmatter.image.alt }}
 		/>
 		<PostContent><slot /></PostContent>
+
+		<Section>
+    		<section>
+        		{/* <DividerText text="Loading comments..." /> */}
+        		<GiscusLoader />
+      		</section>
+		</Section>
 	</div>
 </Base>

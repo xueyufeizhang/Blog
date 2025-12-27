@@ -4,27 +4,34 @@ import Base from '@/layouts/Base.astro';
 import Section from '@/components/Section.astro';
 import Card from '@/components/Card.astro';
 import Heading from '@/components/Heading.astro';
+import Pagination from '@/components/Pagination.astro'; // 引入新组件
 import { sortPostsByDate } from '@/utils/data.util';
-import { MarkdownInstance } from 'astro';
+import type { MarkdownInstance } from 'astro';
 
-const { title } = AppConfig;
-const { description } = AppConfig;
+const { title, description } = AppConfig;
 
+const PER_PAGE = 5;
 const allPosts = Object.values(
-	import.meta.glob('./*.md', { eager: true })
+  import.meta.glob('./*.md', { eager: true })
 ) as MarkdownInstance<any>[];
 allPosts.sort(sortPostsByDate);
+
+const totalPages = Math.ceil(allPosts.length / PER_PAGE);
+const pagePosts = allPosts.slice(0, PER_PAGE);
 ---
 
 <Base head={{ title, description }}>
-	<Section><Heading title="Posts" /></Section>
-	<Section>
-		{
-			allPosts.map((post: any) => (
-				<div class="mb-4 basis-1 last:mb-0">
-					<Card post={post} />
-				</div>
-			))
-		}
-	</Section>
+  <Section><Heading title="Posts" /></Section>
+  
+  <Section>
+    {pagePosts.map((post: any) => (
+      <div class="mb-4 basis-1 last:mb-0">
+        <Card post={post} />
+      </div>
+    ))}
+  </Section>
+
+  <Section>
+    <Pagination currentPage={1} totalPages={totalPages} />
+  </Section>
 </Base>

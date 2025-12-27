@@ -1,0 +1,79 @@
+---
+import Section from '@/components/Section.astro';
+import Card from '@/components/Card.astro';
+import Base from '@/layouts/Base.astro';
+import Heading from '@/components/Heading.astro';
+import Pagination from '@/components/Pagination.astro'; // 引入分页组件
+import { AppConfig } from '@/utils/AppConfig';
+import { MarkdownInstance } from 'astro';
+import { sortPostsByDate } from '@/utils/data.util';
+
+export async function getStaticPaths() {
+  const PER_PAGE = 5; // 每页显示数量
+  const allPosts = Object.values(
+    import.meta.glob('../../posts/*.md', { eager: true })
+  ) as MarkdownInstance<any>[];
+
+  // 1. 获取所有标签
+  const allTags = new Set(
+    allPosts.map((post) => post.frontmatter.tags).flat()
+  );
+
+  // 2. 为每个标签生成分页路径
+  return [...allTags].flatMap((tag) => {
+    const filteredPosts = allPosts
+      .filter((post) => post.frontmatter.tags.includes(tag))
+      .sort(sortPostsByDate);
+
+    const totalPages = Math.ceil(filteredPosts.length / PER_PAGE);
+
+    return Array.from({ length: totalPages }, (_, i) => {
+      const currentPage = i + 1;
+      const start = i * PER_PAGE;
+      const end = start + PER_PAGE;
+      
+      return {
+        params: { 
+          tag: tag,
+          // 第一页路径为空（即 /tags/tag名），其余为数字（/tags/tag名/2）
+          page: currentPage === 1 ? undefined : String(currentPage) 
+        },
+        props: {
+          posts: filteredPosts.slice(start, end),
+          currentPage,
+          totalPages,
+          tag
+        }
+      };
+    });
+  });
+}
+
+const { posts, currentPage, totalPages, tag } = Astro.props;
+const { description } = AppConfig;
+---
+
+<Base head={{ title: `${tag} - Page ${currentPage}`, description }}>
+  <Section>
+    <Heading title={`Posts with #${tag}`} />
+    <div class="pt-2 text-center">
+      <a href="/tags" class="underline hover:text-orange-600">all tags →</a>
+    </div>
+  </Section>
+
+  <Section>
+    {posts.map((post: any) => (
+      <div class="mb-4 basis-1 last:mb-0">
+        <Card post={post} />
+      </div>
+    ))}
+  </Section>
+
+  <Section>
+    <Pagination 
+      currentPage={currentPage} 
+      totalPages={totalPages} 
+      baseUrl={`/tags/${tag}`} 
+    />
+  </Section>
+</Base>

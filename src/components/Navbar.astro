@@ -17,10 +17,18 @@ import Section from './Section.astro';
 				<ul class="hidden flex-row sm:flex">
 					<li><a href="/" class="mr-3 hover:text-orange-600">HOME</a></li>
 					<li><a href="/about" class="mr-3 hover:text-orange-600">ABOUT</a></li>
-					<li><a href="/posts" class="hover:text-orange-600">POSTS</a></li>
-					<!-- <li><a href="/tags" class="hover:text-orange-600">TAGS</a></li> -->
+					<li><a href="/posts" class="mr-3 hover:text-orange-600">POSTS</a></li>
+					<li><a href="/tags" class="hover:text-orange-600">TAGS</a></li>
 				</ul>
 			</nav>
+
+			<nav>
+  				<a href="/posts"></a>
+  				<a href="/search" class="ml-4 flex items-center gap-1">
+    				<span>🔍</span>
+  				</a>
+			</nav>
+
 			<!-- Desktop Theme Switcher -->
 			<div class="ml-3 hidden flex-col justify-center sm:flex">
 				<input type="checkbox" id="light-switch-desktop" class="light-switch sr-only" />

@@ -1,44 +1,85 @@
 ---
 import Heading from '@/components/Heading.astro';
 import Section from '@/components/Section.astro';
-import Tag from '@/components/Tag.astro';
 import Base from '@/layouts/Base.astro';
 import { AppConfig } from '@/utils/AppConfig';
 import { MarkdownInstance } from 'astro';
 
-const { title } = AppConfig;
-const { description } = AppConfig;
+const { title, description } = AppConfig;
 
+// 1. 获取所有文章并提取标签 [cite: 31, 32]
 const allPosts = Object.values(
 	import.meta.glob('../posts/*.md', { eager: true })
 ) as MarkdownInstance<any>[];
+
 const allTags = allPosts.map((post) => post.frontmatter.tags).flat();
-const uniqueTags: Set<string> = new Set(allTags);
-let tagMap: Record<string, number> = {};
+const uniqueTags = [...new Set(allTags)];
 
-[...uniqueTags].forEach((tag) => {
-	const count = allTags.filter((t) => t === tag).length;
-	tagMap[tag] = count;
-});
-
-tagMap = Object.fromEntries(Object.entries(tagMap).sort((a, b) => b[1] - a[1]));
+// 2. 统计每个标签的数量并按数量从高到低排序 [cite: 32, 33]
+const tagMap = uniqueTags
+  .map(tag => ({
+    name: tag,
+    count: allTags.filter(t => t === tag).length
+  }))
+  .sort((a, b) => b.count - a.count);
 ---
 
-<Base head={{ title, description }}>
-	<Section><Heading title="Tags" /></Section>
-	<Section>
-	<div class="mx-auto grid w-full max-w-screen-md grid-cols-1 gap-x-6 px-4 md:grid-cols-2 md:px-0">
-		{
-			Object.entries(tagMap).map(([tag, count]) => (
-				<a
-					class="group row-span-1 flex justify-between py-2 hover:text-orange-600"
-					href={`/tags/${tag}`}
-				>
-					<Tag tag={tag} />
-					<p>{count}</p>
-				</a>
-			))
-		}
-	</div>
-	</Section>
+<Base head={{ title: `Tags - ${title}`, description }}>
+  <Section>
+    <Heading title="Tags" />
+	<p class="py-2"></p>
+	<p class="py-2"></p>
+    <p class="text-muted-foreground mt-2 text-center text-sm">
+      Discover {tagMap.length} topics across {allPosts.length} posts
+    </p>
+  </Section>
+
+  <Section>
+    <div class="flex flex-wrap justify-center gap-4 py-8">
+      {
+        tagMap.map(({ name, count }) => (
+          <a
+            href={`/tags/${name}`}
+            class="group relative flex items-center gap-2 overflow-hidden rounded-full border border-gray-200 bg-white px-5 py-2 transition-all hover:border-orange-500 hover:bg-orange-50 dark:border-gray-800 dark:bg-gray-900 dark:hover:bg-orange-950/30"
+          >
+            {/* 标签名称 */}
+            <span class="text-sm font-medium text-gray-700 transition-colors group-hover:text-orange-600 dark:text-gray-300 dark:group-hover:text-orange-400">
+              # {name}
+            </span>
+            
+            {/* 数量角标 */}
+            <span class="flex h-5 w-5 items-center justify-center rounded-full bg-gray-100 text-[10px] font-bold text-gray-500 transition-colors group-hover:bg-orange-600 group-hover:text-white dark:bg-gray-800">
+              {count}
+            </span>
+            
+            {/* 鼠标悬浮时的背景微光效果 */}
+            <div class="absolute inset-0 -z-10 bg-gradient-to-r from-orange-500/0 via-orange-500/5 to-orange-500/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
+          </a>
+        ))
+      }
+    </div>
+  </Section>
 </Base>
+
+<style>
+  /* 添加简单的入场动画，让页面加载更生动 */
+  a {
+    animation: fade-in 0.5s ease-out backwards;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* 让每个标签错开一点时间显示 */
+  {tagMap.map((_, i) => `
+    a:nth-child(${i + 1}) { animation-delay: ${i * 0.05}s; }
+  `)}
+</style>

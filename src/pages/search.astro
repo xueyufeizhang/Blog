@@ -1,0 +1,45 @@
+---
+import Base from '@/layouts/Base.astro';
+import Section from '@/components/Section.astro';
+import Heading from '@/components/Heading.astro';
+import PagefindSearch from "node_modules/astro-pagefind/src/components/Search";
+---
+
+<Base head={{ title: "Search - Blog", description: "Search for posts" }}>
+  <Section>
+    <Heading title="Search" />
+  </Section>
+
+  <Section>
+    <div class="mt-4">
+      {/* 使用 astro-pagefind 提供的 UI 组件 */}
+      <PagefindSearch 
+        id="search" 
+        className="pagefind-ui" 
+        uiOptions={{ showImages: false, translations: { placeholder: "Search posts..." } }} 
+      />
+    </div>
+  </Section>
+</Base>
+
+<style is:global>
+  @reference "/Users/arvin/arvinDoc/blog/main_blog/src/styles/global.css";
+  /* 这里的样式可以根据你的橙色风格进行调整 */
+  :root {
+    --pagefind-ui-primary: #ea580c; /* 使用你喜欢的深橙色 */
+    --pagefind-ui-text: #000000;
+    --pagefind-ui-background: #ffffff;
+    --pagefind-ui-border: #d1d5db; /* 与你日历的灰色保持一致 */
+  }
+
+  .dark {
+    --pagefind-ui-primary: #fb923c;
+    --pagefind-ui-text: #ffffff;
+    --pagefind-ui-background: #1c1c1c;
+    --pagefind-ui-border: #374151;
+  }
+  
+  .pagefind-ui .pagefind-ui__result-link {
+    @apply underline hover:text-orange-600;
+  }
+</style>

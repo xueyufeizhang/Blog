@@ -1,0 +1,59 @@
+---
+// src/components/Pagination.astro
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseUrl?: string;
+}
+
+const { currentPage, totalPages, baseUrl = '/posts' } = Astro.props;
+
+// 辅助函数：生成正确的路径
+const getPath = (p: number) => {
+  if (p === 1) return `${baseUrl}/`;
+  return `${baseUrl}/${p}`;
+};
+---
+
+{totalPages > 1 && (
+  <nav class="mt-6 flex items-center justify-center gap-2">
+    {/* 上一页按钮 */}
+    {currentPage > 1 && (
+      <a
+        href={getPath(currentPage - 1)}
+        class="px-3 py-1 rounded border hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      >
+        Prev
+      </a>
+    )}
+
+    {/* 页码数字 */}
+    {Array.from({ length: totalPages }).map((_, i) => {
+      const p = i + 1;
+      const isCurrent = p === currentPage;
+      return (
+        <a
+          href={getPath(p)}
+          aria-current={isCurrent ? 'page' : undefined}
+          class={`px-3 py-1 rounded border transition-colors ${
+            isCurrent 
+              ? 'bg-gray-200 dark:bg-gray-700 font-bold' 
+              : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+          }`}
+        >
+          {p}
+        </a>
+      );
+    })}
+
+    {/* 下一页按钮 */}
+    {currentPage < totalPages && (
+      <a
+        href={getPath(currentPage + 1)}
+        class="px-3 py-1 rounded border hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+      >
+        Next
+      </a>
+    )}
+  </nav>
+)}
