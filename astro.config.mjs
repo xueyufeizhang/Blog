@@ -34,7 +34,7 @@ const options = {
 
 // https://astro.build/config
 export default defineConfig({
-    site: 'https://zxyf.top/',
+    site: 'https://zxyf.top',
 
     markdown: {
         syntaxHighlight: false,
