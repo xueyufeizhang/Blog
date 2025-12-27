@@ -1,0 +1,116 @@
+---
+// Simple client-side TOC: finds h2/h3 inside .content and renders links
+---
+
+<nav class="mb-6 p-0 text-sm" aria-label="目录">
+  <p class="mb-3 font-semibold">Table of Contents</p>
+  <div class="border-l border-stone-300 dark:border-stone-700 pl-3">
+    <ul id="toc-list" class="space-y-2"></ul>
+  </div>
+</nav>
+
+<script>
+  // @ts-nocheck
+  /** @type {Set<number>} */
+  const levels = new Set([2, 3]);
+  /** @param {string} text */
+  function slugify(text) {
+    return (text || '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\u4e00-\u9fa5\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  }
+
+  /** @param {HTMLElement} el */
+  function ensureId(el) {
+    if (!el.id) {
+      el.id = slugify(el.textContent || '');
+    }
+    return el.id;
+  }
+
+  function buildTOC() {
+    /** @type {HTMLElement | null} */
+    const container = document.querySelector('.content');
+    /** @type {HTMLUListElement | null} */
+    const list = document.getElementById('toc-list');
+    if (!container || !list) return;
+
+    const hs = Array.from(container.querySelectorAll('h2, h3'))
+      .filter((h) => levels.has(parseInt(h.tagName.substring(1), 10)));
+
+    list.innerHTML = '';
+    hs.forEach((h) => {
+      const id = ensureId(h);
+      const level = h.tagName.toLowerCase();
+      const li = document.createElement('li');
+      li.className = level === 'h3' ? 'pl-4' : '';
+
+      const a = document.createElement('a');
+      a.href = `#${id}`;
+      a.textContent = h.textContent || '';
+      a.className = 'text-stone-700 hover:text-orange-600 dark:text-stone-200';
+
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+
+    // Smooth scroll and manual activation on click
+    list.addEventListener('click', (e) => {
+      const a = e.target.closest('a');
+      if (!a) return;
+      e.preventDefault();
+      const targetId = (a.getAttribute('href') || '').replace('#', '');
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        activateLink(targetId);
+        history.replaceState(null, '', `#${targetId}`);
+      }
+    });
+  }
+
+  function activateLink(id) {
+    document.querySelectorAll('#toc-list a').forEach((a) => {
+      const match = a.getAttribute('href') === `#${id}`;
+      a.classList.toggle('text-orange-600', match);
+      a.classList.toggle('font-semibold', match);
+      if (match) {
+        a.setAttribute('aria-current', 'true');
+      } else {
+        a.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  function initScrollSpy() {
+    const container = document.querySelector('.content');
+    if (!container) return;
+    const headings = Array.from(container.querySelectorAll('h2, h3'));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            if (id) activateLink(id);
+          }
+        });
+      },
+      { rootMargin: '0px 0px -70% 0px', threshold: 0.1 }
+    );
+    headings.forEach((h) => observer.observe(h));
+  }
+
+  function start() {
+    buildTOC();
+    initScrollSpy();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
+</script>

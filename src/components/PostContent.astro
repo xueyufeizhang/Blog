@@ -1,12 +1,21 @@
 ---
 import Section from './Section.astro';
+import TableOfContents from './TableOfContents.astro';
 ---
 
 <Section>
-	<div
-		class="content prose dark:prose-invert prose-code:rounded-lg prose-code:bg-stone-800 prose-code:p-1 prose-code:text-orange-600 prose-img:rounded-lg prose-img:shadow-xl prose-img:dark:shadow-stone-800 mt-8 max-w-none text-base leading-8 text-black dark:text-white"
-	>
-		<slot />
+	<div class="relative">
+		<!-- Place TOC in the outer right margin on large screens -->
+		<aside class="hidden lg:block absolute right-[-22rem] top-0 z-10 w-[18rem] h-full">
+			<div class="sticky top-10">
+				<TableOfContents />
+			</div>
+		</aside>
+	    <div
+		    class="content prose dark:prose-invert prose-code:rounded-lg prose-code:bg-stone-800 prose-code:p-1 prose-code:text-orange-600 prose-img:rounded-lg prose-img:shadow-xl prose-img:dark:shadow-stone-800 mt-8 max-w-none text-base leading-8 text-black dark:text-white"
+	    >
+		    <slot />
+	    </div>
 	</div>
 </Section>
 
@@ -14,4 +23,10 @@ import Section from './Section.astro';
      so we need to keep some custom CSS but applied through Tailwind's plugin system -->
 <style is:global>
 	/* These styles are for code highlighting that can't be easily implemented with just Tailwind */
+
+	/* Ensure anchored headings don't hide under sticky navbar */
+	.content h2,
+	.content h3 {
+		scroll-margin-top: 6rem;
+	}
 </style>

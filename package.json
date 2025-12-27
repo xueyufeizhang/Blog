@@ -26,6 +26,8 @@
 		"react-dom": "19.2.3",
 		"reading-time": "1.5.0",
 		"rehype-pretty-code": "0.14.1",
+		"rehype-slug": "^6.0.0",
+		"remark-autolink-headings": "^7.0.1",
 		"tailwindcss": "4.1.18",
 		"typescript": "5.9.3"
 	},
@@ -36,6 +38,6 @@
 		"prettier-plugin-tailwindcss": "0.7.2"
 	},
 	"overrides": {
-  		"path-to-regexp": "^6.3.0"
+		"path-to-regexp": "^6.3.0"
 	}
 }

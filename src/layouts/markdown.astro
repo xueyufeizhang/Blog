@@ -1,0 +1,28 @@
+---
+import Base from '@/layouts/Base.astro'
+import Section from '@/components/Section.astro';
+import { AppConfig } from '@/utils/AppConfig';
+import type { MarkdownLayoutProps } from 'astro'
+
+type Props = MarkdownLayoutProps<{
+  // Define frontmatter props here
+  title: string
+  description?: string
+}>
+
+const { description } = AppConfig;
+// Now, `frontmatter`, `url`, and other Markdown layout properties
+// are accessible with type safety
+const { frontmatter } = Astro.props
+---
+
+<Base head={{ title: frontmatter.title, description }}>
+  <Section>
+    <h1 class="mb-3 text-[1.75rem] text-heading1 font-semibold">
+      # {frontmatter.title}
+    </h1>
+    <div class="mb-5 prose dark:prose-invert">
+      <slot />
+    </div>
+  </Section>
+</Base>
