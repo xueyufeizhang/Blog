@@ -1,27 +1,25 @@
 import rss from '@astrojs/rss';
 
 export async function GET(context) {
-  // 1. 获取新路径下的所有文章
   const postImportResult = import.meta.glob('../content/posts/**/index.md', { eager: true });
   const posts = Object.values(postImportResult);
 
   return rss({
     title: "Arvin's Blog",
-    description: 'A blog sharing my study path for LLMs.',
-    site: context.site, // 这会用到你 astro.config.mjs 里的 site 属性
-    // 2. 手动映射文章字段
+    description: "A blog sharing my study path for LLMs.",
+    site: context.site,
+    stylesheet: './rss/styles.xsl', // 确保 public 目录下有这个文件
     items: posts.map((post) => {
-      // 从路径提取 slug，保持和 [slug].astro 一致
       const slug = post.file.split('/').slice(-2, -1)[0];
-      
       return {
         title: post.frontmatter.title,
-        pubDate: post.frontmatter.date,
+        // 核心修复 1：确保日期被正确传递，插件会自动生成 <pubDate>
+        pubDate: post.frontmatter.pubDate || post.frontmatter.date || new Date(), 
         description: post.frontmatter.description,
-        // 这里的链接必须手动指向你现在的路由地址
         link: `/posts/${slug}/`, 
       };
     }),
-    customData: `<language>en-us</language>`,
+    // 核心修复 2：暂时移除不规范的 customData 命名空间，先让页面跑通
+    customData: `<language>en-us</language>`, 
   });
 }

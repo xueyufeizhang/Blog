@@ -130,7 +130,18 @@ This file is in BETA. Please test and contribute to the discussion:
                 </a>
               </h3>
               <small class="text-gray">
-                Published: <xsl:value-of select="pubDate" />
+                Published: 
+                <xsl:choose>
+                  <xsl:when test="contains(pubDate, ' 00:00:00')">
+                    <xsl:value-of select="substring-before(pubDate, ' 00:00:00')"/>
+                  </xsl:when>
+                  <xsl:when test="string-length(pubDate) > 16">
+                    <xsl:value-of select="substring(pubDate, 1, 16)"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="pubDate"/>
+                  </xsl:otherwise>
+                </xsl:choose>
               </small>
             </div>
           </xsl:for-each>
