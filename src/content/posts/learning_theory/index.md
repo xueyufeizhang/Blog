@@ -69,10 +69,12 @@ where $\mathbb{I}$ is the indicator function means the Loss function here is 0-1
 ### Probably Approximately Correct (PAC) Learning
 
 >Can Only Be Probably Correct
+>
 >***Claim***: Even when $R_{\mathcal{D}}(h^*)=0$, we can't hope to find $h$ s.t. $R_{\mathcal{D}}(h)=0$.
 >***Relaxation***: $R_{\mathcal{D}}(h)\leq \epsilon$, where $\epsilon$ is user-specified
 
 >Can Only Be Approximately Correct
+>
 >***Claim***: No algorithm can guarantee $R_{\mathcal{D}}\leq \epsilon$ for sure.
 >***Relaxation***: Allow the alg. to fail with probability $\delta$, where $\delta\in(0,1)$ is user-specified.
 
@@ -84,6 +86,7 @@ where $\mathbb{I}$ is the indicator function means the Loss function here is 0-1
 That is ***PAC Learning***.
 
 >Realizability Assumption
+>
 >Assume that, for a given class $\mathcal{H}$ of functions $f:\mathcal{X}\rightarrow\mathcal{Y}$, there exists $h^*\in\mathcal{H}$ such that $R_{\mathcal{D}}(h^*)=0$, which implies that $h^*$ is the Bayes classifier.
 
 ![](20250306131010.png)
@@ -108,6 +111,7 @@ Which are the important concepts to measure complexity of hypothesis space.
 > In order to prove that $VC(\mathcal{H})$ is at least $d$, we need to show only that there's at least ***one*** set of size $d$ that can be shattered by $\mathcal{H}$.
 
 > Linear Classifier
+>
 > Consider $\mathcal{H}$ as the set of linear classifiers in $d$ dimensions, then $VC(\mathcal{H}) = d+1$.
 
 #### Not PAC Learnable
