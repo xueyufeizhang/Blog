@@ -5,6 +5,8 @@ import rehypeSlug from 'rehype-slug';
 import remarkAutolinkHeadings from 'remark-autolink-headings';
 import vercelStatic from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import pagefind from 'astro-pagefind';
@@ -40,7 +42,9 @@ export default defineConfig({
         syntaxHighlight: false,
         // Disable syntax built-in syntax hightlighting from astro
         rehypePlugins: [[rehypePrettyCode, options], rehypeSlug],
-        remarkPlugins: [remarkReadingTime, [remarkAutolinkHeadings, { behavior: 'wrap' }]]
+        remarkPlugins: [remarkReadingTime, [remarkAutolinkHeadings, { behavior: 'wrap' }]],
+        remarkPlugins: [remarkMath],
+        rehypePlugins: [rehypeKatex]
     },
 
     integrations: [react(), sitemap(), pagefind()],
