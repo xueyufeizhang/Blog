@@ -11,7 +11,7 @@ import { sortPostsByDate } from '@/utils/data.util';
 export async function getStaticPaths() {
   const PER_PAGE = 5; // 每页显示数量
   const allPosts = Object.values(
-    import.meta.glob('../../posts/*.md', { eager: true })
+    import.meta.glob('../../../content/posts/**/index.md', { eager: true })
   ) as MarkdownInstance<any>[];
 
   // 1. 获取所有标签

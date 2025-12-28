@@ -1,5 +1,4 @@
 ---
-layout: ../../layouts/post.astro
 title: "GitHub+Hexo搭建自己的私人博客（超详细版）"
 pubDate: 2025-12-27
 description: "This is the third post of my new Astro blog."

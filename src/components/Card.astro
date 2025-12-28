@@ -9,9 +9,13 @@ interface Props {
 
 const { post } = Astro.props;
 const isPinned = post.frontmatter.isPinned === true;
+
+const fileUrl = post.file;
+const slug = fileUrl.split('/').slice(-2, -1)[0]; 
+const cleanUrl = `/posts/${slug}`; // 构建最终的浏览器访问路径
 ---
 
-<a href={post.url}>
+<a href={cleanUrl}>
 	<div
 		class="h-full rounded-2xl bg-stone-200/50 from-orange-900 via-amber-700 to-white p-[1px] text-sm shadow-[inset_0_0_0_1px_rgba(255,255,255,0.4)] hover:bg-gradient-to-r dark:bg-gray-900"
 	>

@@ -9,7 +9,7 @@ const { title, description } = AppConfig;
 
 // 1. 获取所有文章并提取标签 [cite: 31, 32]
 const allPosts = Object.values(
-	import.meta.glob('../posts/*.md', { eager: true })
+	import.meta.glob('../../content/posts/**/index.md', { eager: true })
 ) as MarkdownInstance<any>[];
 
 const allTags = allPosts.map((post) => post.frontmatter.tags).flat();

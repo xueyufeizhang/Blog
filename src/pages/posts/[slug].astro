@@ -1,0 +1,30 @@
+---
+// 引用你之前的 post 布局
+import PostLayout from '@/layouts/post.astro';
+
+// 1. 定义静态路径：告诉 Astro 有哪些文章需要渲染
+export async function getStaticPaths() {
+  // 使用递归匹配，找到 content/posts 文件夹下所有的 index.md
+  const posts = import.meta.glob('../../content/posts/**/index.md', { eager: true });
+  
+  return Object.values(posts).map((post: any) => {
+    // 从文件路径中提取文件夹名作为 slug
+    // 例如 "../../content/posts/my-article/index.md" -> "my-article"
+    const slug = post.file.split('/').slice(-2, -1)[0];
+    
+    return {
+      params: { slug }, // 这必须与文件名 [slug].astro 对应
+      props: { post },
+    };
+  });
+}
+
+const { post } = Astro.props;
+const { Content } = post; // 获取渲染后的 Markdown 内容
+const { frontmatter } = post; // 获取文章元数据
+
+---
+
+<PostLayout frontmatter={frontmatter}>
+  <Content />
+</PostLayout>

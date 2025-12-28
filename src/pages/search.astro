@@ -16,7 +16,20 @@ import PagefindSearch from "node_modules/astro-pagefind/src/components/Search";
       <PagefindSearch 
         id="search" 
         className="pagefind-ui" 
-        uiOptions={{ showImages: false, translations: { placeholder: "Search posts..." } }} 
+        uiOptions={{ 
+          showImages: false,
+          excerptLength: 50, // Shorten preview to prevent duplicates from cluttering
+          translations: { 
+            placeholder: "Search posts...", 
+            clear_search: "Clear",
+            load_more: "Load more",
+            search_label: "Search posts",
+            filters_label: "Filters",
+            zero_results: "No results found for \"[SEARCH_TERM]\"",
+            many_results: "Found [COUNT] results",
+            one_result: "Found 1 result"
+            } 
+        }} 
       />
     </div>
   </Section>

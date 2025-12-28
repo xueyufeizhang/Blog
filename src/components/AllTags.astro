@@ -5,7 +5,7 @@ import Heading from './Heading.astro';
 import Tag from './Tag.astro';
 
 const allPosts = Object.values(
-	import.meta.glob('../pages/posts/*.md', { eager: true })
+	import.meta.glob('../content/posts/**/index.md', { eager: true })
 ) as MarkdownInstance<any>[];
 
 // Extract all unique tags from posts
