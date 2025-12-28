@@ -13,16 +13,25 @@ const { frontmatter } = Astro.props;
 <Base head={{ title: frontmatter.title, description }}>
 	<div class="w-full max-w-screen-xl px-4 lg:ml-41 lg:px-8">
 		<div class="max-w-screen-md">
-			<PostHeader
-				title={frontmatter.title}
-				author={frontmatter.author}
-				tags={frontmatter.tags}
-				minutesRead={frontmatter.minutesRead}
-				pubDate={frontmatter.pubDate}
-				isPinned={frontmatter.isPinned}
-				img={{ src: frontmatter.image.src, alt: frontmatter.image.alt }}
-			/>
-			<PostContent><slot /></PostContent>
+			<article data-pagefind-body>
+				<PostHeader
+					title={frontmatter.title}
+					author={frontmatter.author}
+					tags={frontmatter.tags}
+					minutesRead={frontmatter.minutesRead}
+					pubDate={frontmatter.pubDate}
+					isPinned={frontmatter.isPinned}
+					img={{ src: frontmatter.image.src, alt: frontmatter.image.alt }}
+				/>
+
+				<div style="display:none">
+					{frontmatter.tags?.map((tag: string) => (
+						<span data-pagefind-filter="Tag">{tag}</span>
+					))}
+				</div>
+
+				<PostContent><slot /></PostContent>
+			</article>
 
 			<Section>
 				<section>

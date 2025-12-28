@@ -12,13 +12,14 @@ import PagefindSearch from "node_modules/astro-pagefind/src/components/Search";
 
   <Section>
     <div class="mt-4">
-      {/* 使用 astro-pagefind 提供的 UI 组件 */}
       <PagefindSearch 
         id="search" 
         className="pagefind-ui" 
         uiOptions={{ 
           showImages: false,
-          excerptLength: 50, // Shorten preview to prevent duplicates from cluttering
+          excerptLength: 50,
+          showSubResults: false,
+          showEmptyFilters: false,
           translations: { 
             placeholder: "Search posts...", 
             clear_search: "Clear",
@@ -28,7 +29,7 @@ import PagefindSearch from "node_modules/astro-pagefind/src/components/Search";
             zero_results: "No results found for \"[SEARCH_TERM]\"",
             many_results: "Found [COUNT] results",
             one_result: "Found 1 result"
-            } 
+          } 
         }} 
       />
     </div>
@@ -37,12 +38,13 @@ import PagefindSearch from "node_modules/astro-pagefind/src/components/Search";
 
 <style is:global>
   @reference "../styles/global.css";
-  /* 这里的样式可以根据你的橙色风格进行调整 */
+
   :root {
-    --pagefind-ui-primary: #ea580c; /* 使用你喜欢的深橙色 */
+    --pagefind-ui-primary: #ea580c;
     --pagefind-ui-text: #000000;
     --pagefind-ui-background: #ffffff;
-    --pagefind-ui-border: #d1d5db; /* 与你日历的灰色保持一致 */
+    --pagefind-ui-border: #d1d5db;
+    --pagefind-ui-font: sans-serif;
   }
 
   .dark {
@@ -51,8 +53,49 @@ import PagefindSearch from "node_modules/astro-pagefind/src/components/Search";
     --pagefind-ui-background: #1c1c1c;
     --pagefind-ui-border: #374151;
   }
-  
-  .pagefind-ui .pagefind-ui__result-link {
-    @apply underline hover:text-orange-600;
+
+  /* 1. 确保搜索框容器始终占据 100% 宽度，不随结果变化 */
+  .pagefind-ui__form {
+    width: 100% !important;
+    margin-bottom: 2rem; /* 在搜索框和下方列表/筛选器之间留出间距 */
+  }
+
+  /* 2. 调整布局：搜索框置顶，下方才是左右分布 */
+  .pagefind-ui {
+    display: flex;
+    flex-wrap: wrap; /* 允许换行，使搜索框独占一行 */
+    flex-direction: row-reverse; 
+    align-items: flex-start;
+    gap: 2.5rem;
+    width: 100%;
+  }
+
+  /* 3. 结果列表区域：保持伸缩 */
+  .pagefind-ui__drawer {
+    flex: 1;
+    min-width: 0; /* 防止内容溢出导致布局崩坏 */
+  }
+
+  /* 4. 侧边栏过滤器：保持固定宽度 */
+  .pagefind-ui__filters {
+    width: 200px;
+    flex-shrink: 0;
+    background: rgba(243, 244, 246, 0.5);
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .dark .pagefind-ui__filters {
+    background: rgba(31, 41, 55, 0.5);
+  }
+
+  /* 手机端适配 */
+  @media (max-width: 768px) {
+    .pagefind-ui {
+      flex-direction: column;
+    }
+    .pagefind-ui__filters {
+      width: 100%;
+    }
   }
 </style>
