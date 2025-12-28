@@ -2,7 +2,7 @@
 import { formatDate } from '@/utils/data.util';
 import Section from './Section.astro';
 import Tags from './Tags.astro';
-import PinnedBadge from './PinnedBadge.astro';
+// import PinnedBadge from './PinnedBadge.astro'; // 不再需要这个组件
 
 interface Props {
 	title: string;
@@ -24,17 +24,43 @@ const formattedDate = formatDate(pubDate);
 
 <Section>
 	<div class="flex flex-col items-center">
-		<div class="relative px-14 pt-6 pb-4 text-center">
-			{isPinned && <PinnedBadge size="md" class="absolute top-6 left-10 -translate-y-1/2" />}
-			<p class="text-4xl font-bold">{title}</p>
+		<div class="px-4 py-6 text-center max-w-4xl">
+			<h1 class="text-4xl font-bold leading-tight">{title}</h1>
 		</div>
+
 		<div class="pb-4">
 			<Tags tags={tags} withHref={true} />
 		</div>
-		<div class="text-sm">
-			<span>{formattedDate}</span> - <span>{minutesRead}</span>
+
+		<div class="flex flex-wrap items-center justify-center gap-4 text-sm text-stone-500 dark:text-stone-400">
+			
+			{/* 如果是置顶文章，显示橙色 Top 标记 */}
+			{isPinned && (
+				<span class="flex items-center gap-1 font-bold text-orange-600 dark:text-orange-400">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"></path>
+						<line x1="12" y1="17" x2="12" y2="22"></line>
+					</svg>
+					Top
+				</span>
+			)}
+
+			<span>{formattedDate}</span>
+			
+			<span class="opacity-30">|</span>
+			
+			<span>{minutesRead}</span>
 		</div>
 
-		{img.src ? <img src={img.src} alt={img.alt} /> : null}
+		{/* 图片区域 */}
+		{img.src ? (
+			<div class="mt-8 w-full">
+				<img 
+					src={img.src} 
+					alt={img.alt} 
+					class="mx-auto rounded-xl shadow-sm"
+				/>
+			</div>
+		) : null}
 	</div>
 </Section>

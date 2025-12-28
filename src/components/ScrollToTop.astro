@@ -1,0 +1,52 @@
+---
+// 如果你没有astro-icon，可以用下面的SVG替代方案
+---
+
+<button
+  id="back-to-top"
+  aria-label="Back to Top"
+  class="fixed bottom-8 right-8 z-50 flex h-12 w-12 translate-y-12 items-center justify-center rounded-full border border-stone-200 bg-white/80 text-stone-600 opacity-0 shadow-lg shadow-orange-500/20 backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-orange-500 hover:text-orange-600 dark:border-stone-700 dark:bg-stone-800/80 dark:text-stone-300 dark:hover:border-orange-400 dark:hover:text-orange-400 pointer-events-none"
+>
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    class="h-6 w-6" 
+    fill="none" 
+    viewBox="0 0 24 24" 
+    stroke="currentColor" 
+    stroke-width="2.5"
+  >
+    <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+  </svg>
+</button>
+
+<script>
+  const backToTopBtn = document.getElementById('back-to-top');
+
+  function toggleBtn() {
+    if (!backToTopBtn) return;
+    
+    // 逻辑：滚动超过 300px 显示，否则隐藏
+    if (window.scrollY > 300) {
+      backToTopBtn.classList.remove('opacity-0', 'translate-y-12', 'pointer-events-none');
+      backToTopBtn.classList.add('opacity-100', 'translate-y-0', 'pointer-events-auto');
+    } else {
+      backToTopBtn.classList.add('opacity-0', 'translate-y-12', 'pointer-events-none');
+      backToTopBtn.classList.remove('opacity-100', 'translate-y-0', 'pointer-events-auto');
+    }
+  }
+
+  function scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth' // 丝滑滚动核心
+    });
+  }
+
+  // 监听滚动
+  window.addEventListener('scroll', toggleBtn);
+  // 监听点击
+  backToTopBtn?.addEventListener('click', scrollToTop);
+  
+  // 初始化检查一次（防止刷新页面在中间时按钮不显示）
+  toggleBtn();
+</script>

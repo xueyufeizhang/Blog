@@ -3,41 +3,57 @@ import { AppConfig } from '@/utils/AppConfig';
 import Base from '@/layouts/Base.astro';
 import PostHeader from '@/components/PostHeader.astro';
 import PostContent from '@/components/PostContent.astro';
-import Section from '@/components/Section.astro'
+import Section from '@/components/Section.astro';
 import GiscusLoader from '@/components/GiscusLoader.astro';
+import TableOfContents from '@/components/TableOfContents.astro';
+import ScrollToTop from '@/components/ScrollToTop.astro';
 
 const { description } = AppConfig;
 const { frontmatter } = Astro.props;
 ---
 
 <Base head={{ title: frontmatter.title, description }}>
-	<div class="w-full max-w-screen-xl px-4 lg:ml-41 lg:px-8">
-		<div class="max-w-screen-md">
-			<article data-pagefind-body>
-				<PostHeader
-					title={frontmatter.title}
-					author={frontmatter.author}
-					tags={frontmatter.tags}
-					minutesRead={frontmatter.minutesRead}
-					pubDate={frontmatter.pubDate}
-					isPinned={frontmatter.isPinned}
-					img={{ src: frontmatter.image.src, alt: frontmatter.image.alt }}
-				/>
+  
+  <Section>
 
-				<div style="display:none">
-					{frontmatter.tags?.map((tag: string) => (
-						<span data-pagefind-filter="Tag">{tag}</span>
-					))}
-				</div>
+    <div class="mb-8 w-full">
+      <PostHeader
+        title={frontmatter.title}
+        author={frontmatter.author}
+        tags={frontmatter.tags}
+        minutesRead={frontmatter.minutesRead}
+        pubDate={frontmatter.pubDate}
+        isPinned={frontmatter.isPinned}
+        img={{ src: frontmatter.image.src, alt: frontmatter.image.alt }}
+      />
+    </div>
 
-				<PostContent><slot /></PostContent>
-			</article>
+    <div class="flex items-start gap-5">
+      
+      <main class="min-w-0 grow">
+        
+        <article class="content" data-pagefind-body>
+          
+          <div style="display:none">
+            {frontmatter.tags?.map((tag: string) => (
+              <span data-pagefind-filter="Tag">{tag}</span>
+            ))}
+          </div>
 
-			<Section>
-				<section>
-					<GiscusLoader />
-				</section>
-			</Section>
-		</div>
-	</div>
+          <PostContent><slot /></PostContent>
+        </article>
+
+        <div class="mt-8">
+            <GiscusLoader />
+        </div>
+      </main>
+
+      <aside class="hidden lg:block w-60 shrink-0 sticky mt-11 top-13">
+        <TableOfContents />
+      </aside>
+
+    </div>
+
+  </Section>
+<ScrollToTop />
 </Base>
