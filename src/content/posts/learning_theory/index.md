@@ -92,7 +92,7 @@ That is ***PAC Learning***.
 ![](20250306131010.png)
 $m_{\mathcal{H}}$ is called the ***sample complexity*** of learning $\mathcal{H}$.
 
-**PAC Learnability*** 的核心思想是：如果一个假设类是 PAC Learnable，意味着我们可以通过有限数量的样本来学到一个接近最优的假设，并保证其泛化误差可控。
+***PAC Learnability*** 的核心思想是：如果一个假设类是 PAC Learnable，意味着我们可以通过有限数量的样本来学到一个接近最优的假设，并保证其泛化误差可控。
 
 ![](20250306131605.png)
 With more constraints, 
