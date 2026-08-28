@@ -44,7 +44,7 @@ const { page, totalPages, pageData, title, description } = Astro.props;
 ---
 
 <Base head={{ title: `${title} - Page ${page}`, description }}>
-  <Section><Heading title="All notes" /></Section>
+    <Section><Heading title="Notes" /></Section>
   
   <Section>
     {pageData.map((post: any) => (

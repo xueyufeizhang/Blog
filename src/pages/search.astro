@@ -2,101 +2,532 @@
 import Base from '@/layouts/Base.astro';
 import Section from '@/components/Section.astro';
 import Heading from '@/components/Heading.astro';
-import PagefindSearch from "node_modules/astro-pagefind/src/components/Search";
 import { AppConfig } from '@/utils/AppConfig';
+import { formatPostLabel, isPublishedPost } from '@/utils/data.util';
+import type { MarkdownInstance } from 'astro';
+
+const allPosts = Object.values(
+	import.meta.glob('../content/posts/**/index.md', { eager: true })
+) as MarkdownInstance<any>[];
+const publishedPosts = allPosts.filter(isPublishedPost);
+
+const countValues = (values: string[]) =>
+	Array.from(new Set(values.filter(Boolean)))
+		.sort((a, b) => a.localeCompare(b))
+		.map((value) => ({
+			value,
+			count: values.filter((candidate) => candidate === value).length
+		}));
+
+const filterGroups = [
+	{
+		name: 'Topic',
+		label: 'Topics',
+		values: countValues(publishedPosts.flatMap((post) => post.frontmatter.tags ?? []))
+	},
+	{
+		name: 'Language',
+		label: 'Language',
+		values: countValues(publishedPosts.map((post) => post.frontmatter.language))
+	},
+	{
+		name: 'Type',
+		label: 'Type',
+		values: countValues(publishedPosts.map((post) => post.frontmatter.type))
+	},
+	{
+		name: 'Status',
+		label: 'Status',
+		values: countValues(publishedPosts.map((post) => post.frontmatter.status))
+	}
+].filter((group) => group.values.length > 0);
+
+const displayFilterValue = (name: string, value: string) =>
+	name === 'Language' ? value.toUpperCase() : formatPostLabel(value);
+
+const suggestions = Array.from(
+	new Set([
+		...publishedPosts.flatMap((post) => post.frontmatter.tags ?? []),
+		'GitHub',
+		'PAC learning'
+	])
+).slice(0, 5);
 ---
 
-<Base head={{ title: `Search | ${AppConfig.site_name}`, description: "Search Xueyufei's notes and posts" }}>
-  <Section>
-    <Heading title="Search" />
-  </Section>
+<Base
+	head={{
+		title: `Search | ${AppConfig.site_name}`,
+		description: "Search Xueyufei's notes by content, topic, language, type, and status."
+	}}
+>
+	<Section>
+		<div class="max-w-3xl">
+      <Heading title="Search" />
+			<p class="mt-2 text-sm leading-6 text-stone-600 dark:text-stone-400">
+				Search the full text of every note, then narrow the results by topic, language, type, or status.
+			</p>
+		</div>
+	</Section>
 
-  <Section>
-    <div class="mt-4">
-      <PagefindSearch 
-        id="search" 
-        className="pagefind-ui" 
-        uiOptions={{ 
-          showImages: false,
-          excerptLength: 50,
-          showSubResults: false,
-          showEmptyFilters: false,
-          translations: { 
-            placeholder: "Search notes and posts...",
-            clear_search: "Clear",
-            load_more: "Load more",
-            search_label: "Search notes and posts",
-            filters_label: "Filters",
-            zero_results: "No results found for \"[SEARCH_TERM]\"",
-            many_results: "Found [COUNT] results",
-            one_result: "Found 1 result"
-          } 
-        }} 
-      />
-    </div>
-  </Section>
+	<Section>
+		<div id="site-search" data-pagefind-bundle="/pagefind/pagefind.js">
+			<form id="search-form" role="search" class="relative" novalidate>
+				<label class="sr-only" for="search-input">Search notes</label>
+				<svg
+					class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-400"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.8"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					aria-hidden="true"
+				>
+					<circle cx="11" cy="11" r="6.5"></circle>
+					<path d="m16 16 4 4"></path>
+				</svg>
+				<input
+					id="search-input"
+					type="search"
+					inputmode="search"
+					autocomplete="off"
+					spellcheck="false"
+					placeholder="Search concepts, titles, or phrases…"
+					class="h-14 w-full rounded-2xl border border-stone-300 bg-white/70 pl-12 pr-24 text-base outline-none transition-all placeholder:text-stone-400 focus:border-orange-400 focus:bg-white focus:ring-4 focus:ring-orange-500/10 dark:border-stone-700 dark:bg-stone-800/70 dark:focus:border-orange-500 dark:focus:bg-stone-800"
+				/>
+				<div class="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
+					<button
+						id="clear-search"
+						type="button"
+						class="hidden h-9 w-9 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-stone-100 hover:text-orange-600 dark:hover:bg-stone-700 dark:hover:text-orange-400"
+						aria-label="Clear search"
+					>
+						<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+							<path d="m7 7 10 10M17 7 7 17" stroke-linecap="round"></path>
+						</svg>
+					</button>
+					<kbd class="hidden rounded-md border border-stone-300 bg-stone-100 px-2 py-1 text-[11px] text-stone-500 sm:inline dark:border-stone-600 dark:bg-stone-700 dark:text-stone-300">/</kbd>
+				</div>
+			</form>
+
+			<div id="search-suggestions" class="mt-5">
+				<p class="mb-3 text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Try a search</p>
+				<div class="flex flex-wrap gap-2">
+					{suggestions.map((suggestion) => (
+						<button
+							type="button"
+							data-search-suggestion={suggestion}
+							class="rounded-full border border-stone-300 bg-white/50 px-3 py-1.5 text-sm transition-colors hover:border-orange-300 hover:bg-orange-50 hover:text-orange-700 dark:border-stone-700 dark:bg-stone-800/50 dark:hover:border-orange-700 dark:hover:bg-orange-950/20 dark:hover:text-orange-300"
+						>
+							{suggestion}
+						</button>
+					))}
+				</div>
+			</div>
+
+			<details class="mt-6 rounded-2xl border border-stone-200 bg-white/35 open:bg-white/55 dark:border-stone-800 dark:bg-stone-800/20 dark:open:bg-stone-800/35" open>
+				<summary class="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-bold marker:hidden">
+					<span>Filter notes</span>
+					<span class="flex items-center gap-3">
+						<button id="clear-filters" type="button" class="hidden text-xs font-normal text-orange-600 hover:underline dark:text-orange-400">Clear filters</button>
+						<svg class="h-4 w-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+							<path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path>
+						</svg>
+					</span>
+				</summary>
+				<div class="grid gap-5 border-t border-stone-200 px-4 py-4 sm:grid-cols-2 lg:grid-cols-4 dark:border-stone-700">
+					{filterGroups.map((group) => (
+						<fieldset>
+							<legend class="mb-2 text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">{group.label}</legend>
+							<div class="flex flex-wrap gap-2">
+								{group.values.map(({ value, count }) => (
+									<label class="cursor-pointer">
+										<input class="peer sr-only" type="checkbox" data-filter-name={group.name} value={value} />
+										<span class="inline-flex items-center gap-1.5 rounded-full border border-stone-300 px-2.5 py-1 text-xs transition-colors hover:border-orange-300 peer-checked:border-orange-400 peer-checked:bg-orange-50 peer-checked:text-orange-700 dark:border-stone-600 dark:hover:border-orange-700 dark:peer-checked:border-orange-600 dark:peer-checked:bg-orange-950/25 dark:peer-checked:text-orange-300">
+											{displayFilterValue(group.name, value)}
+											<span class="text-[10px] opacity-60">{count}</span>
+										</span>
+									</label>
+								))}
+							</div>
+						</fieldset>
+					))}
+				</div>
+			</details>
+
+			<div class="mt-7 flex min-h-6 items-center justify-between gap-4">
+				<p id="search-status" class="text-sm text-stone-600 dark:text-stone-400" aria-live="polite">
+					Start typing to search {publishedPosts.length} {publishedPosts.length === 1 ? 'note' : 'notes'}.
+				</p>
+				<div id="search-loading" class="hidden items-center gap-2 text-xs text-stone-500" aria-hidden="true">
+					<span class="h-3 w-3 animate-spin rounded-full border-2 border-stone-300 border-t-orange-500"></span>
+					Searching
+				</div>
+			</div>
+
+			<ol id="search-results" class="mt-4 space-y-3"></ol>
+
+			<button
+				id="load-more-results"
+				type="button"
+				class="mx-auto mt-6 hidden min-h-11 rounded-xl border border-stone-300 px-5 py-2 text-sm transition-colors hover:border-orange-400 hover:text-orange-600 dark:border-stone-700 dark:hover:border-orange-600 dark:hover:text-orange-400"
+			>
+				Load more results
+			</button>
+
+			<template id="search-result-template">
+				<li>
+					<a data-result-link class="group block rounded-2xl border border-stone-200 bg-white/55 p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-orange-300/70 hover:bg-white hover:shadow-[0_16px_36px_-28px_rgba(234,88,12,0.45)] sm:p-5 dark:border-stone-800 dark:bg-stone-800/45 dark:hover:border-orange-700/70 dark:hover:bg-stone-800">
+						<div class="flex items-start justify-between gap-4">
+							<h2 data-result-title class="text-lg font-bold leading-snug group-hover:text-orange-700 dark:group-hover:text-orange-300"></h2>
+							<svg class="mt-1 h-4 w-4 shrink-0 text-stone-400 transition-transform group-hover:translate-x-0.5 group-hover:text-orange-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+								<path d="M5 12h14m-5-5 5 5-5 5" stroke-linecap="round" stroke-linejoin="round"></path>
+							</svg>
+						</div>
+						<p data-result-excerpt class="mt-3 text-sm leading-6 text-stone-600 dark:text-stone-300"></p>
+						<div data-result-meta class="mt-4 flex flex-wrap items-center gap-2"></div>
+						<div data-result-subresults class="mt-4 hidden border-t border-stone-200 pt-3 dark:border-stone-700"></div>
+					</a>
+				</li>
+			</template>
+		</div>
+	</Section>
 </Base>
 
+<script>
+	const searchApp = document.querySelector<HTMLElement>('#site-search');
+	const searchForm = document.querySelector<HTMLFormElement>('#search-form');
+	const searchInput = document.querySelector<HTMLInputElement>('#search-input');
+	const clearSearchButton = document.querySelector<HTMLButtonElement>('#clear-search');
+	const clearFiltersButton = document.querySelector<HTMLButtonElement>('#clear-filters');
+	const searchSuggestions = document.querySelector<HTMLElement>('#search-suggestions');
+	const searchStatus = document.querySelector<HTMLElement>('#search-status');
+	const searchLoading = document.querySelector<HTMLElement>('#search-loading');
+	const searchResults = document.querySelector<HTMLOListElement>('#search-results');
+	const loadMoreButton = document.querySelector<HTMLButtonElement>('#load-more-results');
+	const resultTemplate = document.querySelector<HTMLTemplateElement>('#search-result-template');
+	const filterInputs = Array.from(document.querySelectorAll<HTMLInputElement>('[data-filter-name]'));
+
+	let pagefind: any;
+	let resultReferences: any[] = [];
+	let renderedResults = 0;
+	let activeRequest = 0;
+	let currentQuery = '';
+	let debounceTimer: number | undefined;
+	const pageSize = 6;
+
+	const setLoading = (loading: boolean) => {
+		searchApp?.setAttribute('aria-busy', String(loading));
+		searchLoading?.classList.toggle('hidden', !loading);
+		searchLoading?.classList.toggle('flex', loading);
+	};
+
+	const updateControls = () => {
+		const hasQuery = Boolean(searchInput?.value.trim());
+		const hasFilters = filterInputs.some((input) => input.checked);
+		clearSearchButton?.classList.toggle('hidden', !hasQuery);
+		clearSearchButton?.classList.toggle('flex', hasQuery);
+		searchSuggestions?.classList.toggle('hidden', hasQuery || hasFilters);
+
+		clearFiltersButton?.classList.toggle('hidden', !hasFilters);
+	};
+
+	const getFilters = () => {
+		const selected: Record<string, string[]> = {};
+		for (const input of filterInputs.filter((candidate) => candidate.checked)) {
+			const name = input.dataset.filterName;
+			if (!name) continue;
+			(selected[name] ??= []).push(input.value);
+		}
+		const filters: Record<string, string | { any: string[] }> = {};
+		for (const [name, values] of Object.entries(selected)) {
+			const firstValue = values[0];
+			if (!firstValue) continue;
+			filters[name] = values.length === 1 ? firstValue : { any: values };
+		}
+		return filters;
+	};
+
+	const getPagefind = async () => {
+		if (pagefind) return pagefind;
+		const bundlePath = searchApp?.dataset.pagefindBundle;
+		if (!bundlePath) throw new Error('Search bundle path is missing.');
+		pagefind = await import(/* @vite-ignore */ bundlePath);
+		await pagefind.options({ excerptLength: 30 });
+		return pagefind;
+	};
+
+	const appendHighlightedText = (target: HTMLElement, html = '') => {
+		const parsed = new DOMParser().parseFromString(html, 'text/html');
+		let remaining = 280;
+		let truncated = false;
+		for (const child of Array.from(parsed.body.childNodes)) {
+			const text = child.textContent ?? '';
+			const visibleText = text.slice(0, remaining);
+			if (visibleText.length === 0) {
+				truncated = truncated || text.length > 0;
+				break;
+			}
+			if (child.nodeType === Node.TEXT_NODE) {
+				target.append(visibleText);
+			} else if (child instanceof HTMLElement && child.tagName === 'MARK') {
+				const mark = document.createElement('mark');
+				mark.textContent = visibleText;
+				target.append(mark);
+			} else {
+				target.append(visibleText);
+			}
+			remaining -= visibleText.length;
+			if (visibleText.length < text.length) {
+				truncated = true;
+				break;
+			}
+		}
+		if (truncated) target.append('…');
+	};
+
+	const normalizedValues = (value: unknown) => {
+		if (Array.isArray(value)) return value.map(String);
+		return value ? [String(value)] : [];
+	};
+
+	const addMetaChip = (container: HTMLElement, label: string) => {
+		const chip = document.createElement('span');
+		chip.className = 'search-meta-chip';
+		chip.textContent = label;
+		container.append(chip);
+	};
+
+	const renderResult = (data: any) => {
+		if (!resultTemplate || !searchResults) return;
+		const fragment = resultTemplate.content.cloneNode(true) as DocumentFragment;
+		const link = fragment.querySelector<HTMLAnchorElement>('[data-result-link]');
+		const title = fragment.querySelector<HTMLElement>('[data-result-title]');
+		const excerpt = fragment.querySelector<HTMLElement>('[data-result-excerpt]');
+		const meta = fragment.querySelector<HTMLElement>('[data-result-meta]');
+		const subResults = fragment.querySelector<HTMLElement>('[data-result-subresults]');
+		if (!link || !title || !excerpt || !meta || !subResults) return;
+
+		link.href = data.url;
+		title.textContent = data.meta?.title || data.url;
+		appendHighlightedText(
+			excerpt,
+			currentQuery ? data.excerpt || data.meta?.description || '' : data.meta?.description || data.excerpt || ''
+		);
+
+		if (data.meta?.date) addMetaChip(meta, data.meta.date);
+		if (data.meta?.type) addMetaChip(meta, data.meta.type);
+		if (data.meta?.status) addMetaChip(meta, data.meta.status);
+		if (data.meta?.language) addMetaChip(meta, String(data.meta.language).toUpperCase());
+		for (const topic of normalizedValues(data.filters?.Topic)) addMetaChip(meta, `#${topic}`);
+		if (data.meta?.readingTime) addMetaChip(meta, data.meta.readingTime);
+
+		const sections = Array.isArray(data.sub_results) ? data.sub_results.slice(0, 3) : [];
+		if (sections.length > 0) {
+			const label = document.createElement('p');
+			label.className = 'search-subresults-label';
+			label.textContent = 'Matched sections';
+			subResults.append(label);
+			const list = document.createElement('ul');
+			list.className = 'search-subresults-list';
+			for (const section of sections) {
+				const item = document.createElement('li');
+				const sectionLink = document.createElement('a');
+				sectionLink.href = section.url;
+				sectionLink.textContent = section.title || 'Matching section';
+				item.append(sectionLink);
+				list.append(item);
+			}
+			subResults.append(list);
+			subResults.classList.remove('hidden');
+		}
+
+		searchResults.append(fragment);
+	};
+
+	const renderNextPage = async () => {
+		const request = activeRequest;
+		const next = resultReferences.slice(renderedResults, renderedResults + pageSize);
+		const records = await Promise.all(next.map((result) => result.data()));
+		if (request !== activeRequest) return;
+		for (const record of records) renderResult(record);
+		renderedResults += next.length;
+		loadMoreButton?.classList.toggle('hidden', renderedResults >= resultReferences.length);
+	};
+
+	const updateUrl = (query: string) => {
+		const url = new URL(window.location.href);
+		if (query) url.searchParams.set('q', query);
+		else url.searchParams.delete('q');
+		window.history.replaceState({}, '', url);
+	};
+
+	const runSearch = async () => {
+		if (!searchInput || !searchStatus || !searchResults) return;
+		const query = searchInput.value.trim();
+		currentQuery = query;
+		const filters = getFilters();
+		const hasFilters = Object.keys(filters).length > 0;
+		updateControls();
+		updateUrl(query);
+		activeRequest += 1;
+		const request = activeRequest;
+		resultReferences = [];
+		renderedResults = 0;
+		searchResults.replaceChildren();
+		loadMoreButton?.classList.add('hidden');
+
+		if (!query && !hasFilters) {
+			searchStatus.textContent = 'Start typing to search your notes.';
+			setLoading(false);
+			return;
+		}
+
+		setLoading(true);
+		searchStatus.textContent = query ? `Searching for “${query}”…` : 'Filtering notes…';
+		try {
+			const engine = await getPagefind();
+			const response = await engine.search(query || null, hasFilters ? { filters } : {});
+			if (request !== activeRequest) return;
+			resultReferences = response.results;
+			const count = resultReferences.length;
+			searchStatus.textContent = count === 0
+				? query
+					? `No notes found for “${query}”. Try fewer words or clear a filter.`
+					: 'No notes match the selected filters.'
+				: query
+					? `${count} ${count === 1 ? 'note' : 'notes'} found for “${query}”.`
+					: `${count} ${count === 1 ? 'note matches' : 'notes match'} the selected filters.`;
+			await renderNextPage();
+		} catch (error) {
+			console.error(error);
+			if (request === activeRequest) {
+				searchStatus.textContent = 'The search index could not be loaded. Please refresh and try again.';
+			}
+		} finally {
+			if (request === activeRequest) setLoading(false);
+		}
+	};
+
+	searchForm?.addEventListener('submit', (event) => {
+		event.preventDefault();
+		window.clearTimeout(debounceTimer);
+		runSearch();
+	});
+
+	searchInput?.addEventListener('input', () => {
+		updateControls();
+		window.clearTimeout(debounceTimer);
+		debounceTimer = window.setTimeout(runSearch, 180);
+	});
+
+	clearSearchButton?.addEventListener('click', () => {
+		if (!searchInput) return;
+		searchInput.value = '';
+		searchInput.focus();
+		runSearch();
+	});
+
+	for (const button of document.querySelectorAll<HTMLButtonElement>('[data-search-suggestion]')) {
+		button.addEventListener('click', () => {
+			if (!searchInput) return;
+			searchInput.value = button.dataset.searchSuggestion ?? '';
+			searchInput.focus();
+			runSearch();
+		});
+	}
+
+	for (const input of filterInputs) {
+		input.addEventListener('change', () => {
+			updateControls();
+			runSearch();
+		});
+	}
+
+	clearFiltersButton?.addEventListener('click', (event) => {
+		event.preventDefault();
+		for (const input of filterInputs) input.checked = false;
+		updateControls();
+		runSearch();
+	});
+
+	loadMoreButton?.addEventListener('click', renderNextPage);
+
+	document.addEventListener('keydown', (event) => {
+		const target = event.target as HTMLElement | null;
+		const isTyping = target?.matches('input, textarea, select, [contenteditable="true"]');
+		if (event.key === '/' && !isTyping) {
+			event.preventDefault();
+			searchInput?.focus();
+		}
+		if (event.key === 'Escape' && searchInput && document.activeElement === searchInput) {
+			if (searchInput.value) {
+				searchInput.value = '';
+				runSearch();
+			} else {
+				searchInput.blur();
+			}
+		}
+	});
+
+	const initialQuery = new URL(window.location.href).searchParams.get('q') ?? '';
+	if (searchInput && initialQuery) {
+		searchInput.value = initialQuery;
+		runSearch();
+	} else {
+		updateControls();
+	}
+</script>
+
 <style is:global>
-  @reference "../styles/global.css";
+	#site-search mark {
+		border-radius: 0.2rem;
+		background: color-mix(in srgb, #fb923c 22%, transparent);
+		padding-inline: 0.1rem;
+		color: inherit;
+	}
 
-  :root {
-    --pagefind-ui-primary: #ea580c;
-    --pagefind-ui-text: #000000;
-    --pagefind-ui-background: #ffffff;
-    --pagefind-ui-border: #d1d5db;
-    --pagefind-ui-font: sans-serif;
-  }
+	#site-search .search-meta-chip {
+		display: inline-flex;
+		align-items: center;
+		border-radius: 9999px;
+		background: rgba(214, 211, 209, 0.65);
+		padding: 0.25rem 0.55rem;
+		font-size: 0.625rem;
+		font-weight: 700;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: #57534e;
+	}
 
-  .dark {
-    --pagefind-ui-primary: #fb923c;
-    --pagefind-ui-text: #ffffff;
-    --pagefind-ui-background: #1c1c1c;
-    --pagefind-ui-border: #374151;
-  }
+	.dark #site-search .search-meta-chip {
+		background: rgba(68, 64, 60, 0.8);
+		color: #d6d3d1;
+	}
 
-  /* 1. 确保搜索框容器始终占据 100% 宽度，不随结果变化 */
-  .pagefind-ui__form {
-    width: 100% !important;
-    margin-bottom: 2rem; /* 在搜索框和下方列表/筛选器之间留出间距 */
-  }
+	#site-search .search-subresults-label {
+		margin-bottom: 0.4rem;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #78716c;
+	}
 
-  /* 2. 调整布局：搜索框置顶，下方才是左右分布 */
-  .pagefind-ui {
-    display: flex;
-    flex-wrap: wrap; /* 允许换行，使搜索框独占一行 */
-    flex-direction: row-reverse; 
-    align-items: flex-start;
-    gap: 2.5rem;
-    width: 100%;
-  }
+	#site-search .search-subresults-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem 1rem;
+		font-size: 0.75rem;
+		text-decoration: underline;
+		text-underline-offset: 0.2rem;
+	}
 
-  /* 3. 结果列表区域：保持伸缩 */
-  .pagefind-ui__drawer {
-    flex: 1;
-    min-width: 0; /* 防止内容溢出导致布局崩坏 */
-  }
+	#site-search .search-subresults-list a:hover {
+		color: #ea580c;
+	}
 
-  /* 4. 侧边栏过滤器：保持固定宽度 */
-  .pagefind-ui__filters {
-    width: 200px;
-    flex-shrink: 0;
-    background: rgba(243, 244, 246, 0.5);
-    padding: 1rem;
-    border-radius: 0.5rem;
-  }
-
-  .dark .pagefind-ui__filters {
-    background: rgba(31, 41, 55, 0.5);
-  }
-
-  /* 手机端适配 */
-  @media (max-width: 768px) {
-    .pagefind-ui {
-      flex-direction: column;
-    }
-    .pagefind-ui__filters {
-      width: 100%;
-    }
-  }
+	#site-search input[type='search']::-webkit-search-cancel-button {
+		display: none;
+	}
 </style>

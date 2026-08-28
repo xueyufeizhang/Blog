@@ -10,6 +10,7 @@ import ScrollToTop from '@/components/ScrollToTop.astro';
 
 const { description } = AppConfig;
 const { frontmatter } = Astro.props;
+const searchDate = new Date(frontmatter.updatedDate ?? frontmatter.pubDate).toISOString().slice(0, 10);
 ---
 
 <Base head={{ title: frontmatter.title, description }}>
@@ -38,10 +39,23 @@ const { frontmatter } = Astro.props;
         
         <article class="content" data-pagefind-body>
           
-          <div style="display:none">
+          <div class="hidden" data-pagefind-ignore>
+			<h1 data-pagefind-meta="title">{frontmatter.title}</h1>
+			<span data-pagefind-meta="description">{frontmatter.excerpt ?? frontmatter.description}</span>
+			<span data-pagefind-meta="date">{searchDate}</span>
+			<span data-pagefind-meta="readingTime">{frontmatter.minutesRead}</span>
             {frontmatter.tags?.map((tag: string) => (
-              <span data-pagefind-filter="Tag">{tag}</span>
+				<span data-pagefind-filter="Topic">{tag}</span>
             ))}
+			{frontmatter.type && (
+				<span data-pagefind-filter="Type" data-pagefind-meta="type">{frontmatter.type}</span>
+			)}
+			{frontmatter.status && (
+				<span data-pagefind-filter="Status" data-pagefind-meta="status">{frontmatter.status}</span>
+			)}
+			{frontmatter.language && (
+				<span data-pagefind-filter="Language" data-pagefind-meta="language">{frontmatter.language}</span>
+			)}
           </div>
 
           <PostContent><slot /></PostContent>

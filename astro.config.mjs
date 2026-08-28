@@ -40,14 +40,25 @@ export default defineConfig({
 
     markdown: {
         syntaxHighlight: false,
-        // Disable syntax built-in syntax hightlighting from astro
-        rehypePlugins: [[rehypePrettyCode, options], rehypeSlug],
-        remarkPlugins: [remarkReadingTime, [remarkAutolinkHeadings, { behavior: 'wrap' }]],
-        remarkPlugins: [remarkMath],
-        rehypePlugins: [rehypeKatex]
+		// Disable Astro's built-in highlighting and compose all Markdown plugins once.
+		remarkPlugins: [
+			remarkReadingTime,
+			[remarkAutolinkHeadings, { behavior: 'wrap' }],
+			remarkMath
+		],
+		rehypePlugins: [[rehypePrettyCode, options], rehypeSlug, rehypeKatex]
     },
 
-    integrations: [react(), sitemap(), pagefind()],
+	integrations: [
+		react(),
+		sitemap(),
+		pagefind({
+			indexConfig: {
+				rootSelector: '[data-pagefind-body]',
+				excludeSelectors: ['.katex']
+			}
+		})
+	],
     output: 'static',
 
     adapter: vercelStatic(),
