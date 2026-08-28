@@ -1,268 +1,286 @@
 ---
-title: "GitHub+Hexo搭建自己的私人博客（超详细版）"
+title: '使用 GitHub Pages 与 Hexo 搭建个人博客'
 pubDate: 2025-12-27
-description: "A step-by-step guide to building and publishing a personal blog with GitHub and Hexo."
-author: "Xueyufei Zhang"
+updatedDate: 2026-08-28
+description: '从本地安装 Hexo、配置 GitHub Pages，到部署站点与绑定自定义域名的完整入门指南。'
+author: 'Xueyufei Zhang'
 isPinned: true
 type: guide
 status: complete
 language: zh
-excerpt: "A beginner-friendly walkthrough of setting up Hexo locally, connecting it to GitHub, and publishing a personal blog without managing your own server."
+excerpt: '一篇面向初学者的 Hexo 博客搭建指南：完成本地预览、GitHub Pages 部署，以及可选的自定义域名配置。'
 image:
   src:
   alt:
-tags: ["Blog", "Hexo"]
+tags: ['Blog', 'Hexo', 'GitHub Pages']
 ---
 
-最近的学习生活繁忙，让我萌生了想要搭建一个博客记录自己学习和生活的念头，因此我马上在互联网上寻找解决方案，发现如果自己租用服务器进行搭建，不仅费用不小，学习成本也比较高。所以我认为对于大部分不想太折腾的小白来说，Github+Hexo的解决方案是更加实用的。
+想要一个可以长期记录学习与生活的个人空间，并不一定要从租服务器、配置数据库开始。对于以文字和图片为主的博客，Hexo 可以在本地把 Markdown 文章生成成静态网页，GitHub Pages 则负责免费托管这些网页。两者组合起来，成本低、维护简单，也很适合作为第一次独立建站的起点。
 
-因此，如果你也想拥有一个属于自己的博客，那么就快看下去吧！
+这篇教程以 Windows 为例，最终会完成以下流程：
+
+1. 安装 Node.js 与 Git；
+2. 在本地创建并预览 Hexo 博客；
+3. 将生成的网站部署到 GitHub Pages；
+4. 可选：为博客绑定自己的域名并启用 HTTPS。
+
+> 本文示例中的 `username`、邮箱和域名都需要替换成你自己的信息。软件界面与版本会持续变化，遇到差异时请以 [Hexo 文档](https://hexo.io/docs/) 和 [GitHub Pages 文档](https://docs.github.com/pages) 为准。
 
 <!-- more -->
 
-操作系统：Windows 10
+## 一、准备开发环境
 
-- ##### 第一步：安装软件并配置环境
+### 1. 安装 Node.js
 
-###### 1、安装[Node.js(LTS)](https://nodejs.org/zh-cn/)
+从 [Node.js 官网](https://nodejs.org/) 下载并安装当前的 LTS 版本。Hexo 依赖 Node.js，而 npm 会随 Node.js 一同安装。
 
-<img src="https://pic.imgdb.cn/item/609e406cd1a9ae528f991df2.png">
+安装完成后，打开 PowerShell、Windows Terminal 或 Git Bash，检查版本：
 
-###### 2、安装[Git](https://git-scm.com/)
-
-<img src="https://pic.imgdb.cn/item/609e406cd1a9ae528f991e58.png">
-
-Git的安装过程可能有些复杂，因此在安装的过程中可以参考[Git安装教程](https://www.cnblogs.com/hdlan/p/14395189.html)(作者：hdlan)。
-
-注：根据我自己的安装经验，在安装完Git之后需要手动将`\Git\bin`和`\Git\mingw64\libexec\git-core`添加至系统环境变量
-
-<img src="https://pic.imgdb.cn/item/609e406cd1a9ae528f991eb7.png">
-
-红色方框内的路径由你自己的安装位置决定。
-
-在完成1、2步之后，打开Git Bash
-
-<img src="https://pic.imgdb.cn/item/609e406dd1a9ae528f991f3e.png">
-
-分别执行`git --version`和`NPM -v`命令，如安装无误，将出现版本号，如下图所示：
-
-<img src="https://pic.imgdb.cn/item/609e406dd1a9ae528f991fa5.png">
-
-- ##### 第二步：安装Hexo
-
-###### 1、选择一个你电脑除C盘外的其他盘，并创建blog文件夹。
-
-###### 2、打开电脑的命令提示符，进入刚才创建的blog文件夹。
-
-以我的路径为例：`D:\blog`，因此我们需要在命令提示符中分别输入`D:`和`cd blog`，如下图所示：
-
-<img src="https://pic.imgdb.cn/item/609e4073d1a9ae528f995762.png">
-
-`D:`的意思是进入D盘，`cd xxx`的意思是进入xxx这个文件夹。
-
-###### 3、接下来分别输入下面三条命令（每条输入后需按回车键执行）：
-
+```bash
+node --version
+npm --version
 ```
-npm install hexo-cli -g
-hexo init
+
+如果两条命令都能输出版本号，说明 Node.js 与 npm 已经可以正常使用。
+
+### 2. 安装 Git
+
+从 [Git 官网](https://git-scm.com/download/win) 下载 Windows 安装程序。大多数情况下保留默认选项即可，安装程序会自动配置命令行路径。
+
+完成后检查 Git 版本：
+
+```bash
+git --version
+```
+
+如果系统提示找不到命令，先关闭并重新打开终端；仍然无效时，再检查 Git 是否已加入系统的 `PATH` 环境变量。
+
+## 二、创建 Hexo 博客
+
+### 1. 初始化项目
+
+选择一个便于管理的位置作为博客目录。本文以 PowerShell 和 `D:\blog` 为例：
+
+```powershell
+mkdir D:\blog
+cd D:\blog
+```
+
+安装 Hexo 命令行工具，并在当前空目录中初始化项目：
+
+```bash
+npm install --global hexo-cli
+hexo init .
 npm install
 ```
 
-在命令运行的过程中不出现`ERR!`的错误提示即可，`WARN` 的警告提示可以忽略，不影响正常安装。
+> 目录不必位于 D 盘，但执行 `hexo init .` 时，当前目录应为空。
 
-###### 4、在本地预览网站
+### 2. 启动本地预览
 
-在命令提示符中输入`hexo s --debug`（注意，此时所有的命令行操作都是在blog文件夹下进行的）
+在博客根目录运行：
 
-<img src="https://pic.imgdb.cn/item/609e4073d1a9ae528f9957af.png">
-
-打开自己的浏览器，然后在地址栏输入上图中显示的地址：`http://localhost:4000`
-
-注意，如果这一步没有成功，很有可能是默认的4000端口已经被占用，可以使用`hexo server -p 5000`命令更改默认端口后再重新执行。
-
-<img src="https://pic.imgdb.cn/item/609e4073d1a9ae528f99581b.png">
-
-如果网页出现了上图的博客页面，则说明我们的博客已经搭建成功了
-
-每次编辑完新的博客后，都可以先在本地预览，确认无误后再发布（如何发布我们将在后面介绍）
-
-但是此时，我们只能在本地访问，因此接下来我们要做的，就是将其推送至网站。
-
-- ##### 第三步：推送至网站
-
-###### 1、创建Github仓库（Github不幸被墙，这里可能需要一些上网方法来解决）
-
-首先，创建一个Github账户（username要认真填写，会与之后你博客的网址有关）
-
-注册完成后点击New repository创建新的仓库，如下图所示：
-
-<img src="https://pic.imgdb.cn/item/609e4073d1a9ae528f995885.png">
-
-Repository name一栏为仓库名称，填写`username.github.io`，username就是你的账户名称
-
-<img src="https://pic.imgdb.cn/item/609e4073d1a9ae528f9958e3.png">
-
-然后按照上图指示勾选对应选项后，点击Create repository键完成创建。
-
-###### 2、修改_config.yml文件
-
-进入blog文件夹，找到_config.yml文件并打开（使用Sublime Text或Notepad++等文本编辑软件）
-
-<img src="https://pic.imgdb.cn/item/609e407ad1a9ae528f99943c.png">
-
-打开后将文件拖至最下方，找到deploy项，将其内容修改为：
-
+```bash
+hexo server
 ```
+
+浏览器访问 `http://localhost:4000`。如果能看到 Hexo 的默认页面，说明博客已经成功运行。
+
+如果 `4000` 端口已被占用，可以临时换一个端口：
+
+```bash
+hexo server --port 5000
+```
+
+此时访问 `http://localhost:5000` 即可。停止预览时，在终端按 `Ctrl+C`。
+
+## 三、认识 Hexo 的基本工作流
+
+Hexo 默认将文章保存在 `source/_posts/` 中。创建新文章可以使用：
+
+```bash
+hexo new "文章标题"
+```
+
+写完后，通常按照下面的顺序预览和发布：
+
+```bash
+hexo clean       # 清除上一次生成的静态文件
+hexo generate    # 重新生成网站，简写为 hexo g
+hexo server      # 在本地预览，简写为 hexo s
+hexo deploy      # 部署网站，简写为 hexo d
+```
+
+`hexo clean` 并非每次都必须执行，但在更换主题、修改配置或生成结果异常时很有用。
+
+## 四、创建 GitHub Pages 仓库
+
+1. 登录 [GitHub](https://github.com/)；
+2. 新建一个仓库；
+3. 将仓库命名为 `username.github.io`，其中 `username` 必须与你的 GitHub 用户名完全一致；
+4. 完成创建后，记下仓库的 SSH 地址：
+
+```text
+git@github.com:username/username.github.io.git
+```
+
+这个命名方式对应 GitHub Pages 的用户站点。部署成功后，默认地址就是：
+
+```text
+https://username.github.io
+```
+
+## 五、配置 GitHub 身份验证
+
+### 1. 设置 Git 提交身份
+
+在 Git Bash 中运行：
+
+```bash
+git config --global user.name "username"
+git config --global user.email "your_email@example.com"
+```
+
+这里的用户名用于标识提交者，邮箱可以填写 GitHub 账户邮箱，也可以使用 GitHub 提供的隐私邮箱。
+
+### 2. 创建并添加 SSH 密钥
+
+先检查 `C:\Users\你的用户名\.ssh` 是否已有可用密钥，避免覆盖旧文件。如果没有，创建一对新的 Ed25519 密钥：
+
+```bash
+ssh-keygen -t ed25519 -C "your_email@example.com"
+```
+
+按提示选择保存位置并设置密码。随后打开生成的 `id_ed25519.pub`，复制其中的全部内容。
+
+进入 GitHub 的 **Settings → SSH and GPG keys → New SSH key**，粘贴公钥并保存。最后在终端测试连接：
+
+```bash
+ssh -T git@github.com
+```
+
+第一次连接时需要确认主机指纹。看到包含 `Hi username!` 的提示，就说明验证成功。
+
+> `.pub` 文件是可以上传的公钥；不要把没有 `.pub` 后缀的私钥发送给任何人，也不要提交到代码仓库。
+
+## 六、部署 Hexo 到 GitHub Pages
+
+### 1. 安装部署插件
+
+回到博客根目录，安装 Hexo 的 Git 部署插件：
+
+```bash
+npm install --save hexo-deployer-git
+```
+
+### 2. 修改站点配置
+
+打开博客根目录中的 `_config.yml`，先将站点地址改为自己的 GitHub Pages 地址：
+
+```yaml
+url: https://username.github.io
+```
+
+然后找到或添加 `deploy` 配置：
+
+```yaml
 deploy:
-	type: git
-	repo: 你的仓库地址（如下图所示）
-	branch: master(若在安装Git的第六步时选择了第一个默认选项，则此处为master，否则就填写你自己修改的名称)
+  type: git
+  repo: git@github.com:username/username.github.io.git
+  branch: gh-pages
 ```
 
-<img src="https://pic.imgdb.cn/item/609e407ad1a9ae528f99948b.png">
+YAML 对缩进敏感，请使用空格，不要使用 Tab。仓库地址中的两个 `username` 都需要替换。
 
-修改完成后记得按CTRL+S保存文件。
+### 3. 首次发布
 
-###### 3、链接Github远程仓库
+执行：
 
-在blog文件夹内右键，点击Git Bash Here，进入Git Bash
-
-<img src="https://pic.imgdb.cn/item/609e407ad1a9ae528f9994e9.png">
-
-分别输入以下命令（每条输入后需按回车键执行）：
-
-```
-git config --global user.name "username" （引号内填写Github用户名）
-git config --global user.email "your email address"（引号内填写Github注册时使用的邮箱）
-ssh-keygen -t rsa -c "your email address"（引号内同上）
-```
-
-完成以上步骤后会生成密钥（生成的目录会在命令行内显示，应该是`C:\Users\username\.ssh`）
-
-打开id_rsa.pub文件（可以使用Sublime Text或Notepad++等），并复制里面的全部内容。
-
-打开Github，进入Settings
-
-<img src="https://pic.imgdb.cn/item/609e407ad1a9ae528f999541.png">
-
-选择SSH and GPG keys，并点击New SSH key，如下图所示：
-
-<img src="https://pic.imgdb.cn/item/609e407ad1a9ae528f9995a0.png">
-
-将之前从id_rsa.pub文件内复制的内容全部粘贴到Key栏内，Title可以任意写
-
-<img src="https://pic.imgdb.cn/item/609e4080d1a9ae528f99c30f.png">
-
-再次打开Git Bash，输入`ssh -T git@github.com`，如果出现`Hi, xxx!`则说明链接成功。
-
-###### 4、安装Git部署插件
-
-打开命令提示符，进入blog文件（步骤同上），输入以下命令：
-
-```
-npm install hexo-deployer-git --save
-```
-
-- ##### 第四步：部署并发布
-
-在部署发布你的博客之前，我先为大家介绍一些基本的Hexo命令：
-
-```
-npm install hexo -g # 安装Hexo
-npm update hexo -g # 升级Hexo
-
-hexo n "title" == hexo new "title" # 创建一篇新博客，title处填写博客题目
-hexo clean # 清除生成的博客静态文件
-hexo g # 生成博客静态文件(hexo generate)
-hexo d # 部署博客(hexo deploy)
-hexo s --debug # 本地预览博客
-```
-
-那么接下来我们开始正式部署网站
-
-打开命令提示符，并进入blog文件夹（步骤同上），分别输入以下命令：
-
-```
+```bash
 hexo clean
-hexo g
-hexo d
+hexo generate
+hexo deploy
 ```
 
-完成后打开浏览器，在地址栏输入你的仓库地址，即`username.github.io`
+部署完成后，进入 GitHub 仓库的 **Settings → Pages**：
 
-如果出现博客页面，那么恭喜你，你的博客已经可以在互联网上被访问了。
+1. 在 **Build and deployment** 中选择 **Deploy from a branch**；
+2. 将分支设为 `gh-pages`，目录设为 `/ (root)`；
+3. 保存并等待 GitHub 完成发布。
 
-- ##### 第五步：绑定域名
+几分钟后访问 `https://username.github.io`。之后每次更新文章，可以让 Hexo 在部署前自动生成站点：
 
-实际上，上一步结束之后，你的博客已经算是搭建完成了，但是网址是Github提供的：`username.github.io`，许多小伙伴希望能够使用自己的个性化域名，这就需要进行域名绑定，因此__没有这方面需求的小伙伴可以跳过这一步__。
-
-###### 1、域名部分的设置
-
-选择一个域名代理厂商，本文以[阿里云](https://wanwang.aliyun.com/)为例（[腾讯云](https://dnspod.cloud.tencent.com/)、[百度云](https://cloud.baidu.com/product/bcd.html?track=navigation20200904)、[华为云](https://www.huaweicloud.com/product/domain.html?utm_source=baidu&utm_medium=brand&utm_campaign=10033&utm_content=&utm_term=&utm_adplace=AdPlace024724)等均可）
-
-具体的注册申请过程，这里将不再呈现，点击进入对应厂商的网页，查询你喜欢的个性化域名，进行注册购买即可，如果你本来就有空闲的域名，那么直接进入下一步。
-
-域名准备好之后，进入对应厂商的域名控制台的域名列表，进入`解析`页面
-
-<img src="https://pic.imgdb.cn/item/609e4080d1a9ae528f99c37c.png">
-
-创建两条记录，每一项填写的内容如下表，未说明的项默认就好：
-
-| 主机记录 | 记录类型 | 解析路线(isp) |        记录值        |
-| :------: | :------: | :-----------: | :------------------: |
-|   www    |  CNAME   |     默认      |  username.github.io  |
-|    @     |    A     |     默认      | 185.199.108.153[^注] |
-
-注：这里是Github的IP地址，你也可以ping以下自己的博客网址得到IP地址，方法如下：
-
-打开命令提示符，执行`ping username.github.io`(username是你自己的Github账户名)
-
-<img src="https://pic.imgdb.cn/item/609e4080d1a9ae528f99c3e2.png">
-
-如果是刚刚注册的域名，建议修改一遍DNS服务器，进入`管理`页面
-
-<img src="https://pic.imgdb.cn/item/609e4080d1a9ae528f99c43e.png">
-
-进入`DNS修改`，并点击页面右方的`修改DNS服务器`
-
-<img src="https://pic.imgdb.cn/item/609e4080d1a9ae528f99c4b3.png">
-
-将`当前DNS服务器`下的两个DNS分别填入下方，并点击确认即可。
-
-<img src="https://pic.imgdb.cn/item/609e4097d1a9ae528f9a8aec.png">
-
-###### 2、Github部分的设置
-
-打开Github，进入之前创建的仓库页面，进入`Settings`
-
-<img src="https://pic.imgdb.cn/item/609e4097d1a9ae528f9a8b52.png">
-
-进入`Pages`页面，将`Source`项下的的`Branch: main`改为`Branch: master`
-（若在安装Git的第六步时选择了第一个默认选项，则此处为master，否则就选择你自己修改的名称）
-
-接下来在`Custom domain`项内填入你的域名，并点击`Save`保存，最后选中下面的`Enforce HTTPS`
-
-<img src="https://pic.imgdb.cn/item/609e4097d1a9ae528f9a8bda.png">
-
-###### 3、本地部分的设置
-
-进入本地的blog文件夹，进入`blog\source`目录下，创建一个记事本文件，输入你的域名
-
-<img src="https://pic.imgdb.cn/item/609e4097d1a9ae528f9a8c40.png">
-
-注意，建议这里输入的域名不要带www，如上图所示
-
-保存并命名为`CNAME`，注意保存成__所有文件__而不是__txt文件__。
-
-
-完成以上步骤后，打开命令提示符，进入blog文件夹并分别执行下面的代码：
-
-```
-hexo clean
-hexo g
-hexo d
+```bash
+hexo clean && hexo deploy --generate
 ```
 
-执行完成后打开浏览器，在地址栏输入你自己的域名，就会直接进入你的博客了。
+如果你希望明确观察每一步，也可以继续使用 `hexo clean && hexo generate && hexo deploy`。单独执行 `hexo deploy` 只会部署现有的生成结果，不会自动重新生成。
 
-至此，本篇教程也就到此结束了，有任何问题都可以E-mail联系我！！感谢支持哟~~
+## 七、绑定自定义域名（可选）
+
+如果 `username.github.io` 已经满足需求，可以跳过这一节。绑定域名通常包含三部分：GitHub Pages 配置、DNS 解析，以及 Hexo 中的 `CNAME` 文件。
+
+### 1. 在 GitHub 中填写域名
+
+进入仓库的 **Settings → Pages**，在 **Custom domain** 中填写你的域名，例如：
+
+```text
+example.com
+```
+
+保存后，GitHub 会开始检查 DNS 配置。
+
+### 2. 配置 DNS 解析
+
+在域名服务商的控制台中，为根域名添加以下四条 `A` 记录：
+
+| 主机记录 | 类型 | 记录值            |
+| -------- | ---- | ----------------- |
+| `@`      | `A`  | `185.199.108.153` |
+| `@`      | `A`  | `185.199.109.153` |
+| `@`      | `A`  | `185.199.110.153` |
+| `@`      | `A`  | `185.199.111.153` |
+
+如果还希望使用 `www.example.com`，再添加：
+
+| 主机记录 | 类型    | 记录值               |
+| -------- | ------- | -------------------- |
+| `www`    | `CNAME` | `username.github.io` |
+
+不要通过 `ping` 得到的临时结果替代 GitHub 官方公布的记录值，也不要为该域名配置通配符 DNS 记录。DNS 更新可能需要一段时间才能在全球生效。
+
+### 3. 创建持久化的 CNAME 文件
+
+在本地博客的 `source/` 目录中新建一个名为 `CNAME` 的文件，文件没有扩展名，内容只写一行域名：
+
+```text
+example.com
+```
+
+这个文件会随每次部署一起进入 `gh-pages` 分支，避免自定义域名配置被新的部署覆盖。
+
+重新部署：
+
+```bash
+hexo clean && hexo deploy --generate
+```
+
+DNS 检查通过且证书签发完成后，回到 **Settings → Pages** 启用 **Enforce HTTPS**。
+
+## 八、常见问题
+
+### 本地预览正常，但线上页面没有更新
+
+先确认部署命令没有报错，再检查 Pages 的发布分支是否为 `gh-pages`。浏览器缓存也可能造成短暂差异，可以稍等片刻后强制刷新。
+
+### 执行部署时提示权限不足
+
+运行 `ssh -T git@github.com` 检查 SSH 身份验证，并确认 `_config.yml` 中的仓库地址、GitHub 用户名和仓库名称均正确。
+
+### 自定义域名在重新部署后失效
+
+确认 `source/CNAME` 存在，文件名没有 `.txt` 后缀，内容也不包含 `https://` 或路径。
+
+## 结语
+
+至此，一个可在本地写作、通过 GitHub Pages 发布，并支持自定义域名与 HTTPS 的 Hexo 博客就搭建完成了。真正值得长期维护的不是初始主题，而是稳定的写作流程：用 Markdown 记录内容，在本地检查效果，再把确认无误的版本发布出去。

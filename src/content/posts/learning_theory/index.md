@@ -1,141 +1,315 @@
 ---
-title: "ML&DL Notes: Learning Theory"
+title: 'Machine Learning Notes: Learning Theory'
 pubDate: 2025-12-28
-description: "Study notes on risk, Bayes classifiers, empirical risk, and PAC learning."
-author: "Xueyufei Zhang"
+updatedDate: 2026-08-28
+description: 'Notes on risk, Bayes classifiers, empirical risk minimization, PAC learning, VC dimension, overfitting, and regularization.'
+author: 'Xueyufei Zhang'
 isPinned: false
 type: note
 status: growing
 language: en
-excerpt: "Learning theory notes covering true and empirical risk, the Bayes classifier, IID assumptions, and the intuition behind PAC learning."
+excerpt: 'A structured introduction to the central question of learning theory: when and why performance on a finite sample generalizes to unseen data.'
 image:
   src:
   alt:
-tags: ["Machine Learning"]
+tags: ['Machine Learning', 'Learning Theory']
 ---
 
-Let $\mathcal{X}$ is the *input space*, and $\mathcal{Y}$ is the *output space*.
-Labeled example: $(\mathrm{x}, y)\in\mathcal{X}\times\mathcal{Y}$ . Interpretation:
-- $\mathrm{x}$ represents the description or measurements of an object;
-- $y$ is the category to which that object belongs.
-#### Loss
-Assume there is a distribution $\mathcal{D}$ over space of labeled examples $\mathcal{X}\times\mathcal{Y}$.
-- $\mathcal{D}$ is ***unknown***, but it represents the population we care about;
-- ***Correct*** labeling function: $f: \mathcal{X}\rightarrow\mathcal{Y}$ and that $Y=f(X)$;
-- We define the ***Loss*** of the classifier $h$
+Learning theory asks a deceptively simple question: **when can good performance on a finite training set be trusted to generalize to unseen data?** To answer it, we need precise definitions of error, a model of how data is sampled, and a way to describe the complexity of the hypotheses a learner may choose from.
+
+This note develops those ideas in the following order:
+
+1. loss and population risk;
+2. the Bayes classifier and Bayes risk;
+3. empirical risk minimization from i.i.d. data;
+4. PAC learning and sample complexity;
+5. shattering, VC dimension, overfitting, and regularization.
+
+<!-- more -->
+
+## 1. The statistical learning setup
+
+Let $\mathcal{X}$ be the **input space** and $\mathcal{Y}$ the **output space**. A labeled example is a pair
+
 $$
-L(h(X), f(X)) = L(h(X), Y)=\left\{
-\begin{array}{lr}
-1,& \mathtt{if}\ h(X)\neq Y\\
-0,& \mathtt{if}\ h(X) = Y
-\end{array}
-\qquad 0-1\ Loss
-\right.
+(X,Y) \in \mathcal{X} \times \mathcal{Y},
 $$
-#### True Risk
-The ***true risk*** of a classifier $h$ is `the probability that not predict correctly` on $\mathcal{D}$
+
+where $X$ describes an object and $Y$ is its target label. We assume that examples are drawn from an unknown joint distribution $\mathcal{D}$ over $\mathcal{X}\times\mathcal{Y}$.
+
+A classifier is a function
+
 $$
-R_{\mathcal{D}}(h):= \mathbb{P}[h(X)\neq f(X)] = \mathbb{P}[h(X)\neq Y]
+h: \mathcal{X} \rightarrow \mathcal{Y}.
 $$
-In other words, the ***true risk*** is the expected value of the loss
+
+The learner does not know $\mathcal{D}$. It must infer a useful classifier from a finite sample drawn from that distribution.
+
+### 1.1 Loss
+
+A loss function quantifies the cost of a prediction. For classification, the **0–1 loss** records whether a prediction is wrong:
+
 $$
-R_{\mathcal{D}}(h):=\mathbb{E}_{X\sim\mathcal{D}}\{L(h(X), Y)\}
+\ell(h(X),Y)
+=
+\begin{cases}
+1, & h(X) \neq Y,\\
+0, & h(X) = Y.
+\end{cases}
 $$
->Bayes Classifier
->To find $h:\mathcal{X}\rightarrow\mathcal{Y}$, we try to minimize the ***True Risk*** $\mathbb{P}[h(x)\neq y]$, such that
->$$h(x)=\mathop{\arg\max}\limits_{y\in\mathcal{Y}}\ \mathbb{P}[Y=y|X=x]$$
->As we already know, this is ***Bayes Classifier***.
-#### Bayes Risk
-Donate by $h^*$ the Bayes classifier
-- For the ***Bayes Risk*** $R_{\mathcal{D}}(h^*)$ it holds $R_{\mathcal{D}}(h^*)\leq R_{\mathcal{D}}(h)$ for any $\mathcal{H}$ and $h\in\mathcal{H}$, where $\mathcal{H}$ refer to the set of all possible classifiers.
-- You cannot improve over the Bayes Risk.
 
-### Batch Learning
+This loss treats every mistake equally. Other tasks may use different losses—for example, squared loss for regression or cross-entropy during classifier training.
 
-We do not know $f$ and we need to estimate $h$ from the data
-- Learner's input: Training data $S = \{(x_1, y_1)\dots(x_m, y_m)\}\in (\mathcal{X}\times\mathcal{Y})^m$
-- Learner's output: A prediction rule $h:\mathcal{X}\rightarrow\mathcal{Y}$
-The goal of learner is that `h shoud be correct on future examples`.
+### 1.2 Population risk
 
-#### IID condition
-Key assumption: *an i.i.d.(identically and independently distribution) sample from $\mathcal{D}$*.
-![](20250306112414.png)
-This assumption is the `connection between what we've seen in the past and what we expect to see in the future`.
+The **population risk**, also called the **true risk** or **generalization error**, is the expected loss on a fresh example from $\mathcal{D}$:
 
-#### Empirical Risk
-Calculate Empirical Risk by benchmarking the prediction against ground truth:
 $$
-R_S(h) = \frac{1}{m}\sum^m_{i=1}\mathbb{I}[h(x_i)\neq y_i]
+R_{\mathcal{D}}(h)
+:=
+\mathbb{E}_{(X,Y)\sim\mathcal{D}}
+\left[\ell(h(X),Y)\right].
 $$
-where $\mathbb{I}$ is the indicator function means the Loss function here is 0-1 Loss.
 
-### Probably Approximately Correct (PAC) Learning
+Under 0–1 loss, this expectation is exactly the probability of misclassification:
 
->Can Only Be Probably Correct
->
->***Claim***: Even when $R_{\mathcal{D}}(h^*)=0$, we can't hope to find $h$ s.t. $R_{\mathcal{D}}(h)=0$.
->***Relaxation***: $R_{\mathcal{D}}(h)\leq \epsilon$, where $\epsilon$ is user-specified
-
->Can Only Be Approximately Correct
->
->***Claim***: No algorithm can guarantee $R_{\mathcal{D}}\leq \epsilon$ for sure.
->***Relaxation***: Allow the alg. to fail with probability $\delta$, where $\delta\in(0,1)$ is user-specified.
-
-1. The learner doesn't know $\mathcal{D}$ and Bayes predictor $h^*$.
-2. The learner specifies the ***accuracy parameter*** $\epsilon$ and ***confidence parameter*** $\delta$.
-3. The number of examples can depend on the value of $\epsilon$ and $\delta$, which we call it $m(\epsilon, \delta$); but not depend on distribution $\mathcal{D}$ or Bayes function.
-4. Learner should output a hypothesis $h$ s.t. $\mathbb{P}[R_{\mathcal{D}}\leq\epsilon]\geq1-\delta$.
-
-That is ***PAC Learning***.
-
->Realizability Assumption
->
->Assume that, for a given class $\mathcal{H}$ of functions $f:\mathcal{X}\rightarrow\mathcal{Y}$, there exists $h^*\in\mathcal{H}$ such that $R_{\mathcal{D}}(h^*)=0$, which implies that $h^*$ is the Bayes classifier.
-
-![](20250306131010.png)
-$m_{\mathcal{H}}$ is called the ***sample complexity*** of learning $\mathcal{H}$.
-
-***PAC Learnability*** 的核心思想是：如果一个假设类是 PAC Learnable，意味着我们可以通过有限数量的样本来学到一个接近最优的假设，并保证其泛化误差可控。
-
-![](20250306131605.png)
-With more constraints, 
-![](20250306132114.png)
-for example, the "0-1 Loss" is okay for that, but square Loss isn't because it not bounded.
-
-### Shattering & VC-dimension
-
-Which are the important concepts to measure complexity of hypothesis space.
-![](20250306132724.png)
-对于一个假设集合（Hypothesis Class）$\mathcal{H}$，如果它能够在一个大小为 $m$ 的数据集上**实现所有可能的二分类标记方式**，那么我们说 $\mathcal{H}$ **shatter[v.粉碎]** 了该数据集。i.e. 假设有一个二分类模型（例如直线分类器）和一个数据集，如果能找到某种参数设定，使得该模型能够对数据点的所有可能标签分配方式都正确分类，则称该模型 shatter 了这个数据集。
-
-![](20250306133538.png)
-假设空间 $\mathcal{H}$ 的 **VC 维度**（ VC($\mathcal{H}$) ）是 $\mathcal{H}$ **可以粉碎的最大数据点数**。
-
-> In order to prove that $VC(\mathcal{H})$ is at least $d$, we need to show only that there's at least ***one*** set of size $d$ that can be shattered by $\mathcal{H}$.
-
-> Linear Classifier
->
-> Consider $\mathcal{H}$ as the set of linear classifiers in $d$ dimensions, then $VC(\mathcal{H}) = d+1$.
-
-#### Not PAC Learnable
-![](20250306140403.png)
-
-![](20250306140425.png)
-#### Infinite Hypothesis Classes
--  理论上，假设类可以是无限的，但计算机实现时会受限于离散化存储，任何模型参数都是以浮点数存储的，对于$32\ \mathrm{bits}$ 的浮点数就只有 $2^{32}$ 种可能的取值，因此假设类在计算上是有限的。
-- 对于具有 $d$ 个参数的模型，假设类的大小可以估计为 $2^{32d}$，并且经验法则告诉我们，至少需要 $10d$ 个样本来有效训练模型。
-
-### Overfitting
-The model has pretty excellent performance on the training set, but poor performance on the test data or the real world.
-![](20250308132033.png)
-
-### Regularization ERM (Empirical Risk Minimization)
 $$
-h_S = \mathop{\arg\min}\limits_{h\in\mathcal{H}}\left(\frac{1}{m}\sum_{i=1}^m\mathbb{I}[h(x_i)\neq y_i]+\lambda\ \mathrm{Complexity}(h) \right)
+R_{\mathcal{D}}(h)
+=
+\mathbb{P}_{(X,Y)\sim\mathcal{D}}\!\left[h(X)\neq Y\right].
 $$
-![](20250308135811.png)
 
+Population risk is the quantity we ultimately care about, but it cannot usually be computed because $\mathcal{D}$ is unknown.
 
+## 2. Bayes classifier and Bayes risk
 
+For each input $x$, the **Bayes classifier** chooses a label with the highest conditional probability:
 
+$$
+h_{\mathrm{Bayes}}(x)
+\in
+\operatorname*{arg\,max}_{y\in\mathcal{Y}}
+\mathbb{P}(Y=y\mid X=x).
+$$
 
+Under 0–1 loss, this rule minimizes population risk among all measurable classifiers. Its risk,
+
+$$
+R^* := R_{\mathcal{D}}(h_{\mathrm{Bayes}}),
+$$
+
+is called the **Bayes risk**, and
+
+$$
+R^* \leq R_{\mathcal{D}}(h)
+$$
+
+for every classifier $h$.
+
+The Bayes risk need not be zero. If the same input can genuinely have different labels, some error is irreducible. A deterministic labeling rule $Y=f(X)$ is therefore a special, noise-free case rather than a default assumption.
+
+## 3. Batch learning from data
+
+In batch learning, the learner receives a fixed training set
+
+$$
+S=\left\{(x_1,y_1),\ldots,(x_m,y_m)\right\}
+\in (\mathcal{X}\times\mathcal{Y})^m
+$$
+
+and outputs a prediction rule $h_S:\mathcal{X}\rightarrow\mathcal{Y}$. The goal is not merely to fit $S$, but to perform well on new examples from the same population.
+
+### 3.1 The i.i.d. assumption
+
+The standard assumption is that
+
+$$
+(X_1,Y_1),\ldots,(X_m,Y_m)
+\overset{\mathrm{i.i.d.}}{\sim}\mathcal{D}.
+$$
+
+This means that the examples are **independent** of one another and **identically distributed** according to $\mathcal{D}$.
+
+![The i.i.d. sampling assumption connects the training sample to future observations](20250306112414.png)
+
+The i.i.d. assumption is the bridge between past observations and future data. If the deployment distribution differs substantially from the training distribution, standard generalization guarantees may no longer apply.
+
+### 3.2 Empirical risk
+
+Because population risk is unavailable, we estimate it using the average loss on the training set. The **empirical risk** is
+
+$$
+R_S(h)
+:=
+\frac{1}{m}\sum_{i=1}^{m}\ell(h(x_i),y_i).
+$$
+
+For 0–1 loss,
+
+$$
+R_S(h)
+=
+\frac{1}{m}\sum_{i=1}^{m}
+\mathbb{I}\!\left[h(x_i)\neq y_i\right],
+$$
+
+where $\mathbb{I}[\cdot]$ is the indicator function.
+
+### 3.3 Empirical risk minimization
+
+Given a hypothesis class $\mathcal{H}$, **empirical risk minimization** (ERM) selects
+
+$$
+h_S
+\in
+\operatorname*{arg\,min}_{h\in\mathcal{H}} R_S(h).
+$$
+
+Low empirical risk alone is not enough: a class that is too expressive may memorize the sample. Learning theory studies the conditions under which empirical risk is a reliable proxy for population risk.
+
+## 4. Probably Approximately Correct learning
+
+PAC learning separates a guarantee into two tolerances:
+
+- **Approximately correct:** the learned hypothesis may have population risk up to an accuracy tolerance $\epsilon>0$.
+- **Probably correct:** the guarantee may fail with probability at most $\delta\in(0,1)$ over the random draw of the training sample.
+
+Equivalently, the desired event should occur with probability at least $1-\delta$.
+
+### 4.1 Realizable PAC learning
+
+The **realizability assumption** says that some hypothesis in $\mathcal{H}$ labels the population perfectly. In other words, there exists $h^*\in\mathcal{H}$ such that
+
+$$
+R_{\mathcal{D}}(h^*)=0.
+$$
+
+Under this assumption, $\mathcal{H}$ is PAC learnable if there is an algorithm $A$ and a sample-complexity function $m_{\mathcal{H}}(\epsilon,\delta)$ such that, for every distribution satisfying realizability and every $m\geq m_{\mathcal{H}}(\epsilon,\delta)$,
+
+$$
+\mathbb{P}_{S\sim\mathcal{D}^m}
+\left[
+R_{\mathcal{D}}(A(S))\leq\epsilon
+\right]
+\geq 1-\delta.
+$$
+
+![Formal structure of a PAC-learning guarantee](20250306131010.png)
+
+The sample complexity may depend on $\epsilon$, $\delta$, and the class $\mathcal{H}$, but not on the unknown distribution itself. PAC learnability therefore means that a finite amount of data is sufficient to obtain a controlled generalization error with high confidence.
+
+### 4.2 Agnostic PAC learning
+
+Real-world data may contain noise, and $\mathcal{H}$ may not include a perfect classifier. **Agnostic PAC learning** removes the realizability assumption and instead asks the learner to approach the best risk available within $\mathcal{H}$:
+
+$$
+\mathbb{P}_{S\sim\mathcal{D}^m}
+\left[
+R_{\mathcal{D}}(A(S))
+\leq
+\inf_{h\in\mathcal{H}}R_{\mathcal{D}}(h)+\epsilon
+\right]
+\geq 1-\delta.
+$$
+
+![PAC learnability and its sample-complexity requirement](20250306131605.png)
+
+For a finite hypothesis class, standard uniform-convergence bounds have the qualitative form
+
+$$
+m
+=
+O\!\left(
+\frac{\log|\mathcal{H}|+\log(1/\delta)}{\epsilon^2}
+\right)
+$$
+
+in the agnostic setting. The important message is not the hidden constant, but the dependence: stronger accuracy and confidence requirements demand more data, while a larger hypothesis class carries a complexity cost.
+
+### 4.3 Why boundedness matters
+
+Many elementary concentration arguments assume a bounded loss. The 0–1 loss is bounded in $[0,1]$, so it fits this framework directly. Squared loss is unbounded unless the predictions and targets are themselves restricted; it therefore requires additional assumptions or different tools.
+
+![Conditions used in a bounded-loss learning guarantee](20250306132114.png)
+
+## 5. Hypothesis-class complexity
+
+Counting hypotheses works for finite classes, but many useful model families are infinite. Treating floating-point implementations as technically finite does not resolve the theoretical question: the guarantee should describe the mathematical class and explain which structural property controls generalization.
+
+For binary classification, that property is often the **VC dimension**.
+
+### 5.1 Shattering
+
+Let $C=\{x_1,\ldots,x_m\}\subseteq\mathcal{X}$. A binary hypothesis class $\mathcal{H}$ **shatters** $C$ if it can realize every possible binary labeling of those points:
+
+$$
+\left|
+\left\{
+(h(x_1),\ldots,h(x_m)):h\in\mathcal{H}
+\right\}
+\right|
+=2^m.
+$$
+
+The hypothesis used may change from one labeling to another. Shattering does not require a single classifier to realize all labelings simultaneously.
+
+![Examples of labelings used to test whether a set is shattered](20250306132724.png)
+
+### 5.2 VC dimension
+
+The **VC dimension** of $\mathcal{H}$, written $\operatorname{VCdim}(\mathcal{H})$, is the largest size of a set shattered by $\mathcal{H}$. If arbitrarily large finite sets can be shattered, the VC dimension is infinite.
+
+To prove that $\operatorname{VCdim}(\mathcal{H})\geq d$, it is enough to exhibit **one** set of $d$ points that $\mathcal{H}$ can shatter. To prove that $\operatorname{VCdim}(\mathcal{H})<d$, one must show that **no** set of $d$ points can be shattered.
+
+For affine linear classifiers in $\mathbb{R}^d$—hyperplanes with a bias term—
+
+$$
+\operatorname{VCdim}(\mathcal{H})=d+1.
+$$
+
+![Geometric intuition for the VC dimension of linear classifiers](20250306133538.png)
+
+Under the standard measurability assumptions, a binary hypothesis class is distribution-free PAC learnable if and only if it has finite VC dimension. Infinite classes can therefore be perfectly learnable; what matters is their capacity, not whether they contain infinitely many functions.
+
+![An example illustrating failure of PAC learnability](20250306140403.png)
+
+![The relationship between hypothesis-class capacity and learnability](20250306140425.png)
+
+## 6. Overfitting and regularization
+
+**Overfitting** occurs when a model achieves very low training error but performs poorly on unseen data. It often arises when the selected hypothesis is too sensitive to the finite sample—especially when the class is highly expressive relative to the amount of data.
+
+![Training and test behavior in an overfitting example](20250308132033.png)
+
+Regularization modifies ERM by penalizing complexity:
+
+$$
+h_S
+\in
+\operatorname*{arg\,min}_{h\in\mathcal{H}}
+\left[
+R_S(h)+\lambda\,\Omega(h)
+\right],
+$$
+
+where $\Omega(h)$ measures some notion of complexity and $\lambda\geq0$ controls the trade-off between fitting the sample and preferring a simpler hypothesis.
+
+![Regularization balances empirical fit against model complexity](20250308135811.png)
+
+Regularization does not merely mean “make the model small.” The penalty encodes an inductive bias: a preference for hypotheses expected to generalize better. Examples include weight decay, sparsity penalties, margin maximization, early stopping, and data augmentation.
+
+## 7. The central picture
+
+The main objects of learning theory fit together as follows:
+
+$$
+\text{sample }S
+\xrightarrow{\text{learning algorithm}}
+h_S
+\xrightarrow{\text{generalization analysis}}
+R_{\mathcal{D}}(h_S).
+$$
+
+Empirical risk tells us how well $h_S$ fits observed data. PAC guarantees quantify the accuracy and confidence we can expect on unseen data. VC dimension measures whether the hypothesis class has enough capacity to overfit arbitrary labels. Regularization and class design then provide practical ways to manage that capacity.
+
+The recurring lesson is that generalization depends on a balance among **data quantity**, **hypothesis-class complexity**, **optimization**, and **assumptions about how the data is generated**.

@@ -3,7 +3,22 @@
 ---
 
 <nav class="toc mb-6 p-0 text-sm" aria-label="Table of contents">
-  <p class="mb-3 text-[0.68rem] font-bold uppercase tracking-[0.15em] text-stone-500 dark:text-stone-400">On this page</p>
+  <div class="mb-3 flex min-h-8 items-center justify-between gap-3">
+    <p class="text-[0.68rem] font-bold uppercase tracking-[0.15em] text-stone-500 dark:text-stone-400">On this page</p>
+    <button
+      type="button"
+      data-toc-collapse
+      class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-stone-500 transition-colors hover:bg-stone-200 hover:text-orange-600 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-orange-400"
+      aria-controls="toc-list"
+      aria-expanded="true"
+      aria-label="Hide table of contents"
+      title="Hide table of contents"
+    >
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="m15 6-6 6 6 6" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </button>
+  </div>
   <div class="border-l border-stone-300 dark:border-stone-700">
     <ul id="toc-list" class="space-y-1.5"></ul>
   </div>
@@ -36,13 +51,16 @@
     const container = document.querySelector('.content');
     /** @type {HTMLUListElement | null} */
     const list = document.getElementById('toc-list');
+    const aside = document.querySelector('[data-post-toc]');
+    const expandButton = document.querySelector('[data-toc-expand]');
     if (!container || !list) return;
 
     const hs = Array.from(container.querySelectorAll('h2, h3, h4'))
       .filter((h) => levels.has(parseInt(h.tagName.substring(1), 10)));
 
     if (hs.length === 0) {
-      document.querySelector('[data-post-toc]')?.setAttribute('hidden', '');
+      aside?.setAttribute('hidden', '');
+      expandButton?.setAttribute('hidden', '');
       return;
     }
 
@@ -66,6 +84,14 @@
       list.appendChild(li);
     });
 
+    let startsCollapsed = false;
+    try {
+      startsCollapsed = localStorage.getItem('note-toc-collapsed') === 'true';
+    } catch {
+      // Storage may be unavailable in strict privacy modes.
+    }
+    setTOCCollapsed(startsCollapsed, false);
+
     // Smooth scroll and manual activation on click
     list.addEventListener('click', (e) => {
       const a = e.target.closest('a');
@@ -78,6 +104,38 @@
         activateLink(targetId);
         history.replaceState(null, '', `#${targetId}`);
       }
+    });
+  }
+
+  function setTOCCollapsed(collapsed, persist = true) {
+    const aside = document.querySelector('[data-post-toc]');
+    const expandButton = document.querySelector('[data-toc-expand]');
+    const collapseButton = document.querySelector('[data-toc-collapse]');
+    if (!aside || !expandButton) return;
+
+    aside.toggleAttribute('hidden', collapsed);
+    expandButton.toggleAttribute('hidden', !collapsed);
+    expandButton.setAttribute('aria-expanded', String(!collapsed));
+    collapseButton?.setAttribute('aria-expanded', String(!collapsed));
+
+    if (persist) {
+      try {
+        localStorage.setItem('note-toc-collapsed', String(collapsed));
+      } catch {
+        // The layout still works when storage is unavailable.
+      }
+    }
+  }
+
+  function bindTOCControls() {
+    document.querySelector('[data-toc-collapse]')?.addEventListener('click', () => {
+      setTOCCollapsed(true);
+      requestAnimationFrame(() => document.querySelector('[data-toc-expand]')?.focus());
+    });
+
+    document.querySelector('[data-toc-expand]')?.addEventListener('click', () => {
+      setTOCCollapsed(false);
+      requestAnimationFrame(() => document.querySelector('[data-toc-collapse]')?.focus());
     });
   }
 
@@ -113,6 +171,7 @@
 
   function start() {
     buildTOC();
+    bindTOCControls();
     initScrollSpy();
   }
 

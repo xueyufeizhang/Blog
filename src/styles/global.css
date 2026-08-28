@@ -8,6 +8,10 @@
     display: none !important;
 }
 
+[data-toc-expand][hidden] {
+    display: none !important;
+}
+
 /* Technical note reading surface */
 .note-content {
     --note-text: #44403c;
