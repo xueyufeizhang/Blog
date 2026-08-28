@@ -1,5 +1,5 @@
 ---
-title: 'Machine Learning Notes: Learning Theory'
+title: 'ML&DL Notes: Learning Theory'
 pubDate: 2025-12-28
 updatedDate: 2026-08-28
 description: 'Notes on risk, Bayes classifiers, empirical risk minimization, PAC learning, VC dimension, overfitting, and regularization.'
@@ -12,7 +12,7 @@ excerpt: 'A structured introduction to the central question of learning theory: 
 image:
   src:
   alt:
-tags: ['Machine Learning', 'Learning Theory']
+tags: ['Machine Learning']
 ---
 
 Learning theory asks a deceptively simple question: **when can good performance on a finite training set be trusted to generalize to unseen data?** To answer it, we need precise definitions of error, a model of how data is sampled, and a way to describe the complexity of the hypotheses a learner may choose from.

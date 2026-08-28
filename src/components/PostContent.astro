@@ -112,10 +112,26 @@
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', enhanceCodeBlocks, { once: true });
-  } else {
+  function enhanceTables() {
+    document.querySelectorAll<HTMLTableElement>('.note-content table').forEach((table) => {
+      if (table.parentElement?.classList.contains('note-table-scroll')) return;
+
+      const scrollContainer = document.createElement('div');
+      scrollContainer.className = 'note-table-scroll';
+      table.parentNode?.insertBefore(scrollContainer, table);
+      scrollContainer.appendChild(table);
+    });
+  }
+
+  function enhancePostContent() {
     enhanceCodeBlocks();
+    enhanceTables();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', enhancePostContent, { once: true });
+  } else {
+    enhancePostContent();
   }
 </script>
 

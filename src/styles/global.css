@@ -128,12 +128,21 @@
 
 .note-content :is(ul, ol) {
     margin-block: 1.15rem;
-    padding-inline-start: 1.4rem;
+    margin-inline-start: 0;
+    list-style-position: outside;
+}
+
+.note-content ul {
+    padding-inline-start: 1.75rem;
+}
+
+.note-content ol {
+    padding-inline-start: 2.15rem;
 }
 
 .note-content li {
     margin-block: 0.42rem;
-    padding-inline-start: 0.2rem;
+    padding-inline-start: 0.3rem;
 }
 
 .note-content li::marker {
@@ -175,14 +184,34 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
 }
 
-.note-content table {
-    display: block;
+.note-content .note-table-scroll {
     width: 100%;
     max-width: 100%;
     margin-block: 1.8rem;
     overflow-x: auto;
     border: 1px solid var(--note-border);
     border-radius: 0.75rem;
+    scrollbar-color: #a8a29e transparent;
+    scrollbar-width: thin;
+}
+
+.note-content .note-table-scroll::-webkit-scrollbar {
+    height: 0.55rem;
+}
+
+.note-content .note-table-scroll::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: #a8a29e;
+    background-clip: padding-box;
+}
+
+.note-content table {
+    display: table;
+    width: 100%;
+    min-width: max-content;
+    margin: 0;
+    border: 0;
     border-collapse: separate;
     border-spacing: 0;
     font-size: 0.9rem;
@@ -206,6 +235,27 @@
     border-right: 1px solid var(--note-border);
     border-bottom: 1px solid var(--note-border);
     padding: 0.7rem 0.9rem;
+    vertical-align: middle;
+}
+
+.note-content tbody tr:nth-child(even) {
+    background: rgba(245, 245, 244, 0.55);
+}
+
+.dark .note-content tbody tr:nth-child(even) {
+    background: rgba(41, 37, 36, 0.35);
+}
+
+.note-content tbody tr {
+    transition: background-color 140ms ease;
+}
+
+.note-content tbody tr:hover {
+    background: rgba(255, 237, 213, 0.45);
+}
+
+.dark .note-content tbody tr:hover {
+    background: rgba(124, 45, 18, 0.18);
 }
 
 .note-content tr:last-child td {
