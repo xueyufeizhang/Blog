@@ -12,7 +12,7 @@ excerpt: 'A structured introduction to the central question of learning theory: 
 image:
   src:
   alt:
-tags: ['Machine Learning']
+tags: ['ML&DL', 'Machine Learning']
 ---
 
 Learning theory asks a deceptively simple question: **when can good performance on a finite training set be trusted to generalize to unseen data?** To answer it, we need precise definitions of error, a model of how data is sampled, and a way to describe the complexity of the hypotheses a learner may choose from.
