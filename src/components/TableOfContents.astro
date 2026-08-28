@@ -1,18 +1,18 @@
 ---
-// Simple client-side TOC: finds h2/h3 inside .content and renders links
+// Simple client-side TOC: finds h2-h4 inside .content and renders links
 ---
 
-<nav class="mb-6 p-0 text-sm" aria-label="content">
-  <p class="mb-3 font-semibold">Table of Contents</p>
-  <div class="border-l border-stone-300 dark:border-stone-700 pl-3">
-    <ul id="toc-list" class="space-y-2"></ul>
+<nav class="toc mb-6 p-0 text-sm" aria-label="Table of contents">
+  <p class="mb-3 text-[0.68rem] font-bold uppercase tracking-[0.15em] text-stone-500 dark:text-stone-400">On this page</p>
+  <div class="border-l border-stone-300 dark:border-stone-700">
+    <ul id="toc-list" class="space-y-1.5"></ul>
   </div>
 </nav>
 
 <script>
   // @ts-nocheck
   /** @type {Set<number>} */
-  const levels = new Set([2, 3]);
+  const levels = new Set([2, 3, 4]);
   /** @param {string} text */
   function slugify(text) {
     return (text || '')
@@ -38,20 +38,29 @@
     const list = document.getElementById('toc-list');
     if (!container || !list) return;
 
-    const hs = Array.from(container.querySelectorAll('h2, h3'))
+    const hs = Array.from(container.querySelectorAll('h2, h3, h4'))
       .filter((h) => levels.has(parseInt(h.tagName.substring(1), 10)));
+
+    if (hs.length === 0) {
+      document.querySelector('[data-post-toc]')?.setAttribute('hidden', '');
+      return;
+    }
 
     list.innerHTML = '';
     hs.forEach((h) => {
       const id = ensureId(h);
       const level = h.tagName.toLowerCase();
       const li = document.createElement('li');
-      li.className = level === 'h3' ? 'pl-4' : '';
+      li.className = level === 'h4'
+        ? 'toc-item toc-item-deep'
+        : level === 'h3'
+          ? 'toc-item toc-item-nested'
+          : 'toc-item';
 
       const a = document.createElement('a');
       a.href = `#${id}`;
       a.textContent = h.textContent || '';
-      a.className = 'text-stone-700 hover:text-orange-600 dark:text-stone-200';
+      a.className = 'toc-link';
 
       li.appendChild(a);
       list.appendChild(li);
@@ -75,8 +84,7 @@
   function activateLink(id) {
     document.querySelectorAll('#toc-list a').forEach((a) => {
       const match = a.getAttribute('href') === `#${id}`;
-      a.classList.toggle('text-orange-600', match);
-      a.classList.toggle('font-semibold', match);
+      a.classList.toggle('is-active', match);
       if (match) {
         a.setAttribute('aria-current', 'true');
       } else {
@@ -88,7 +96,7 @@
   function initScrollSpy() {
     const container = document.querySelector('.content');
     if (!container) return;
-    const headings = Array.from(container.querySelectorAll('h2, h3'));
+    const headings = Array.from(container.querySelectorAll('h2, h3, h4'));
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -114,3 +122,47 @@
     start();
   }
 </script>
+
+<style is:global>
+  .toc-link {
+    display: block;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    padding: 0.3rem 0 0.3rem 0.85rem;
+    color: rgb(87 83 78);
+    font-size: 0.78rem;
+    line-height: 1.45;
+    transition: border-color 160ms ease, color 160ms ease, transform 160ms ease;
+  }
+
+  .toc-link:hover,
+  .toc-link.is-active {
+    border-left-color: rgb(249 115 22);
+    color: rgb(194 65 12);
+  }
+
+  .toc-link.is-active {
+    font-weight: 700;
+  }
+
+  .toc-item-nested .toc-link {
+    padding-left: 1.5rem;
+    color: rgb(120 113 108);
+    font-size: 0.74rem;
+  }
+
+  .toc-item-deep .toc-link {
+    padding-left: 2.1rem;
+    color: rgb(120 113 108);
+    font-size: 0.72rem;
+  }
+
+  .dark .toc-link {
+    color: rgb(214 211 209);
+  }
+
+  .dark .toc-link:hover,
+  .dark .toc-link.is-active {
+    color: rgb(251 146 60);
+  }
+</style>

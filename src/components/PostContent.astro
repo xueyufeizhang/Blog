@@ -1,15 +1,130 @@
 <div class="relative">
   <div
-    class="content prose dark:prose-invert prose-code:rounded-md prose-code:bg-orange-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-orange-700 prose-code:before:content-none prose-code:after:content-none dark:prose-code:bg-orange-900/30 dark:prose-code:text-orange-300 prose-img:rounded-lg prose-img:shadow-xl prose-img:dark:shadow-stone-800 mt-3 max-w-none break-words text-[15px] leading-7 text-black dark:text-white sm:mt-4 sm:text-base sm:leading-8"
+    class="note-content prose mt-3 max-w-none break-words dark:prose-invert sm:mt-4"
   >
     <slot />
   </div>
 </div>
 
+<script>
+  const languageNames: Record<string, string> = {
+    bash: 'Bash',
+    css: 'CSS',
+    html: 'HTML',
+    js: 'JavaScript',
+    javascript: 'JavaScript',
+    json: 'JSON',
+    jsx: 'JSX',
+    markdown: 'Markdown',
+    md: 'Markdown',
+    plaintext: 'Code',
+    py: 'Python',
+    python: 'Python',
+    sh: 'Shell',
+    shell: 'Shell',
+    sql: 'SQL',
+    ts: 'TypeScript',
+    tsx: 'TSX',
+    yaml: 'YAML',
+    yml: 'YAML'
+  };
+
+  function getLanguage(pre: HTMLPreElement, code: HTMLElement) {
+    const language =
+      code.dataset.language ||
+      pre.dataset.language ||
+      [...code.classList]
+        .find((name) => name.startsWith('language-'))
+        ?.replace('language-', '') ||
+      'plaintext';
+
+    return languageNames[language.toLowerCase()] || language.toUpperCase();
+  }
+
+  function copyIcon() {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.innerHTML = '<rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+    return svg;
+  }
+
+  function enhanceCodeBlocks() {
+    document.querySelectorAll<HTMLPreElement>('.note-content pre').forEach((pre) => {
+      if (pre.closest('.code-block-shell')) return;
+
+      const code = pre.querySelector<HTMLElement>('code');
+      if (!code) return;
+
+      const prettyFigure = pre.closest<HTMLElement>('[data-rehype-pretty-code-figure]');
+      const shell = prettyFigure || document.createElement('div');
+      shell.classList.add('code-block-shell');
+
+      if (!prettyFigure) {
+        pre.parentNode?.insertBefore(shell, pre);
+        shell.appendChild(pre);
+      }
+
+      const toolbar = document.createElement('div');
+      toolbar.className = 'code-block-toolbar';
+
+      const identity = document.createElement('div');
+      identity.className = 'code-block-identity';
+      identity.setAttribute('aria-hidden', 'true');
+
+      const dots = document.createElement('span');
+      dots.className = 'code-block-dots';
+      dots.innerHTML = '<i></i><i></i><i></i>';
+
+      const label = document.createElement('span');
+      label.className = 'code-block-language';
+      label.textContent = getLanguage(pre, code);
+
+      identity.append(dots, label);
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'code-copy-button';
+      button.setAttribute('aria-label', 'Copy code');
+      button.append(copyIcon(), document.createTextNode('Copy'));
+
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(code.innerText);
+          button.classList.add('is-copied');
+          button.lastChild!.textContent = 'Copied';
+          window.setTimeout(() => {
+            button.classList.remove('is-copied');
+            button.lastChild!.textContent = 'Copy';
+          }, 1800);
+        } catch {
+          const range = document.createRange();
+          range.selectNodeContents(code);
+          const selection = window.getSelection();
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+          button.lastChild!.textContent = 'Selected';
+        }
+      });
+
+      toolbar.append(identity, button);
+      shell.insertBefore(toolbar, pre);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', enhanceCodeBlocks, { once: true });
+  } else {
+    enhanceCodeBlocks();
+  }
+</script>
+
 <style is:global>
-  /* 保持原本的锚点偏移逻辑 */
-  .content h2,
-  .content h3 {
+  .note-content h2,
+  .note-content h3,
+  .note-content h4,
+  .note-content h5,
+  .note-content h6 {
     scroll-margin-top: 6rem;
   }
 </style>

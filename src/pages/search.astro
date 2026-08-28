@@ -44,14 +44,6 @@ const filterGroups = [
 
 const displayFilterValue = (name: string, value: string) =>
 	name === 'Language' ? value.toUpperCase() : formatPostLabel(value);
-
-const suggestions = Array.from(
-	new Set([
-		...publishedPosts.flatMap((post) => post.frontmatter.tags ?? []),
-		'GitHub',
-		'PAC learning'
-	])
-).slice(0, 5);
 ---
 
 <Base
@@ -64,7 +56,7 @@ const suggestions = Array.from(
 		<div class="max-w-3xl">
       <Heading title="Search" />
 			<p class="mt-2 text-sm leading-6 text-stone-600 dark:text-stone-400">
-				Search the full text of every note, then narrow the results by topic, language, type, or status.
+				Search Xueyufei's notes by content, topic, language, type, and status.
 			</p>
 		</div>
 	</Section>
@@ -110,48 +102,72 @@ const suggestions = Array.from(
 				</div>
 			</form>
 
-			<div id="search-suggestions" class="mt-5">
-				<p class="mb-3 text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">Try a search</p>
-				<div class="flex flex-wrap gap-2">
-					{suggestions.map((suggestion) => (
-						<button
-							type="button"
-							data-search-suggestion={suggestion}
-							class="rounded-full border border-stone-300 bg-white/50 px-3 py-1.5 text-sm transition-colors hover:border-orange-300 hover:bg-orange-50 hover:text-orange-700 dark:border-stone-700 dark:bg-stone-800/50 dark:hover:border-orange-700 dark:hover:bg-orange-950/20 dark:hover:text-orange-300"
-						>
-							{suggestion}
-						</button>
-					))}
-				</div>
-			</div>
-
-			<details class="mt-6 rounded-2xl border border-stone-200 bg-white/35 open:bg-white/55 dark:border-stone-800 dark:bg-stone-800/20 dark:open:bg-stone-800/35" open>
+			<details class="mt-5 rounded-2xl border border-stone-200 bg-white/35 open:bg-white/55 dark:border-stone-800 dark:bg-stone-800/20 dark:open:bg-stone-800/35" open>
 				<summary class="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-bold marker:hidden">
 					<span>Filter notes</span>
 					<span class="flex items-center gap-3">
+						<span id="active-filter-count" class="hidden rounded-full bg-orange-100 px-2 py-0.5 text-[10px] text-orange-700 dark:bg-orange-950/40 dark:text-orange-300"></span>
 						<button id="clear-filters" type="button" class="hidden text-xs font-normal text-orange-600 hover:underline dark:text-orange-400">Clear filters</button>
-						<svg class="h-4 w-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+						<svg class="filter-chevron h-4 w-4 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
 							<path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path>
 						</svg>
 					</span>
 				</summary>
-				<div class="grid gap-5 border-t border-stone-200 px-4 py-4 sm:grid-cols-2 lg:grid-cols-4 dark:border-stone-700">
-					{filterGroups.map((group) => (
-						<fieldset>
-							<legend class="mb-2 text-xs font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400">{group.label}</legend>
-							<div class="flex flex-wrap gap-2">
-								{group.values.map(({ value, count }) => (
-									<label class="cursor-pointer">
-										<input class="peer sr-only" type="checkbox" data-filter-name={group.name} value={value} />
-										<span class="inline-flex items-center gap-1.5 rounded-full border border-stone-300 px-2.5 py-1 text-xs transition-colors hover:border-orange-300 peer-checked:border-orange-400 peer-checked:bg-orange-50 peer-checked:text-orange-700 dark:border-stone-600 dark:hover:border-orange-700 dark:peer-checked:border-orange-600 dark:peer-checked:bg-orange-950/25 dark:peer-checked:text-orange-300">
-											{displayFilterValue(group.name, value)}
-											<span class="text-[10px] opacity-60">{count}</span>
-										</span>
-									</label>
-								))}
-							</div>
-						</fieldset>
-					))}
+				<div class="border-t border-stone-200 px-4 py-4 dark:border-stone-700">
+					<div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+						{filterGroups.map((group) => (
+							<details class="filter-dropdown relative" data-filter-group data-filter-group-label={group.label}>
+								<summary class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 rounded-xl border border-stone-300 bg-white/65 px-3 py-2 marker:hidden transition-colors hover:border-orange-300 dark:border-stone-700 dark:bg-stone-800/70 dark:hover:border-orange-700">
+									<span class="min-w-0 text-left">
+										<span class="block text-[10px] font-bold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">{group.label}</span>
+										<span data-filter-group-summary class="block truncate text-sm font-normal">All</span>
+									</span>
+									<span class="flex shrink-0 items-center gap-1.5">
+										<span data-filter-group-count class="hidden min-w-5 rounded-full bg-orange-100 px-1.5 py-0.5 text-center text-[10px] font-bold text-orange-700 dark:bg-orange-950/40 dark:text-orange-300"></span>
+										<svg class="filter-chevron h-4 w-4 text-stone-500 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+											<path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round"></path>
+										</svg>
+									</span>
+								</summary>
+
+								<div class="filter-dropdown-menu absolute left-0 right-0 z-30 mt-2 overflow-hidden rounded-xl border border-stone-300 bg-stone-50 shadow-xl shadow-stone-900/10 dark:border-stone-700 dark:bg-stone-900 dark:shadow-black/30">
+									{group.values.length > 6 && (
+										<div class="border-b border-stone-200 p-2 dark:border-stone-700">
+											<label class="sr-only" for={`filter-search-${group.name}`}>Search {group.label.toLowerCase()}</label>
+											<input
+												id={`filter-search-${group.name}`}
+												type="search"
+												data-filter-search
+												placeholder={`Find ${group.label.toLowerCase()}…`}
+												class="h-9 w-full rounded-lg border border-stone-300 bg-white px-3 text-xs outline-none placeholder:text-stone-400 focus:border-orange-400 dark:border-stone-600 dark:bg-stone-800 dark:focus:border-orange-500"
+											/>
+										</div>
+									)}
+									<fieldset class="max-h-64 overflow-y-auto p-2">
+										<legend class="sr-only">{group.label}</legend>
+										{group.values.map(({ value, count }) => {
+											const displayValue = displayFilterValue(group.name, value);
+											return (
+												<label data-filter-option data-filter-search-value={displayValue.toLowerCase()} class="block cursor-pointer">
+													<input class="peer sr-only" type="checkbox" data-filter-name={group.name} data-filter-label={displayValue} value={value} />
+													<span class="flex min-h-10 items-center justify-between gap-3 rounded-lg px-2.5 py-2 text-xs transition-colors hover:bg-stone-200/70 peer-checked:bg-orange-50 peer-checked:text-orange-700 dark:hover:bg-stone-700/70 dark:peer-checked:bg-orange-950/30 dark:peer-checked:text-orange-300">
+														<span class="min-w-0 break-words">{displayValue}</span>
+														<span class="flex shrink-0 items-center gap-2">
+															<span class="text-[10px] opacity-55">{count}</span>
+															<svg class="filter-check h-3.5 w-3.5 opacity-0 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+																<path d="m5 12 4 4L19 6" stroke-linecap="round" stroke-linejoin="round"></path>
+															</svg>
+														</span>
+													</span>
+												</label>
+											);
+										})}
+									</fieldset>
+								</div>
+							</details>
+						))}
+					</div>
+					<p class="mt-3 text-xs leading-5 text-stone-500 dark:text-stone-400">Select multiple values within a filter to match any of them.</p>
 				</div>
 			</details>
 
@@ -200,13 +216,14 @@ const suggestions = Array.from(
 	const searchInput = document.querySelector<HTMLInputElement>('#search-input');
 	const clearSearchButton = document.querySelector<HTMLButtonElement>('#clear-search');
 	const clearFiltersButton = document.querySelector<HTMLButtonElement>('#clear-filters');
-	const searchSuggestions = document.querySelector<HTMLElement>('#search-suggestions');
+	const activeFilterCount = document.querySelector<HTMLElement>('#active-filter-count');
 	const searchStatus = document.querySelector<HTMLElement>('#search-status');
 	const searchLoading = document.querySelector<HTMLElement>('#search-loading');
 	const searchResults = document.querySelector<HTMLOListElement>('#search-results');
 	const loadMoreButton = document.querySelector<HTMLButtonElement>('#load-more-results');
 	const resultTemplate = document.querySelector<HTMLTemplateElement>('#search-result-template');
 	const filterInputs = Array.from(document.querySelectorAll<HTMLInputElement>('[data-filter-name]'));
+	const filterDropdowns = Array.from(document.querySelectorAll<HTMLDetailsElement>('[data-filter-group]'));
 
 	let pagefind: any;
 	let resultReferences: any[] = [];
@@ -224,12 +241,33 @@ const suggestions = Array.from(
 
 	const updateControls = () => {
 		const hasQuery = Boolean(searchInput?.value.trim());
-		const hasFilters = filterInputs.some((input) => input.checked);
+		const selectedFilters = filterInputs.filter((input) => input.checked);
+		const hasFilters = selectedFilters.length > 0;
 		clearSearchButton?.classList.toggle('hidden', !hasQuery);
 		clearSearchButton?.classList.toggle('flex', hasQuery);
-		searchSuggestions?.classList.toggle('hidden', hasQuery || hasFilters);
-
 		clearFiltersButton?.classList.toggle('hidden', !hasFilters);
+		activeFilterCount?.classList.toggle('hidden', !hasFilters);
+		if (activeFilterCount) {
+			activeFilterCount.textContent = `${selectedFilters.length} selected`;
+		}
+
+		for (const dropdown of filterDropdowns) {
+			const selected = Array.from(
+				dropdown.querySelectorAll<HTMLInputElement>('[data-filter-name]:checked')
+			);
+			const summary = dropdown.querySelector<HTMLElement>('[data-filter-group-summary]');
+			const count = dropdown.querySelector<HTMLElement>('[data-filter-group-count]');
+			const labels = selected.map((input) => input.dataset.filterLabel || input.value);
+			if (summary) {
+				summary.textContent = labels.length === 0
+					? 'All'
+					: labels.length === 1
+						? labels[0] ?? '1 selected'
+						: `${labels[0]} +${labels.length - 1}`;
+			}
+			count?.classList.toggle('hidden', selected.length === 0);
+			if (count) count.textContent = String(selected.length);
+		}
 	};
 
 	const getFilters = () => {
@@ -428,15 +466,6 @@ const suggestions = Array.from(
 		runSearch();
 	});
 
-	for (const button of document.querySelectorAll<HTMLButtonElement>('[data-search-suggestion]')) {
-		button.addEventListener('click', () => {
-			if (!searchInput) return;
-			searchInput.value = button.dataset.searchSuggestion ?? '';
-			searchInput.focus();
-			runSearch();
-		});
-	}
-
 	for (const input of filterInputs) {
 		input.addEventListener('change', () => {
 			updateControls();
@@ -449,6 +478,34 @@ const suggestions = Array.from(
 		for (const input of filterInputs) input.checked = false;
 		updateControls();
 		runSearch();
+	});
+
+	for (const dropdown of filterDropdowns) {
+		dropdown.addEventListener('toggle', () => {
+			if (!dropdown.open) return;
+			for (const other of filterDropdowns) {
+				if (other !== dropdown) other.open = false;
+			}
+		});
+	}
+
+	for (const filterSearch of document.querySelectorAll<HTMLInputElement>('[data-filter-search]')) {
+		filterSearch.addEventListener('input', () => {
+			const dropdown = filterSearch.closest<HTMLElement>('[data-filter-group]');
+			const query = filterSearch.value.trim().toLocaleLowerCase();
+			for (const option of dropdown?.querySelectorAll<HTMLElement>('[data-filter-option]') ?? []) {
+				option.classList.toggle(
+					'hidden',
+					Boolean(query) && !option.dataset.filterSearchValue?.includes(query)
+				);
+			}
+		});
+	}
+
+	document.addEventListener('click', (event) => {
+		const target = event.target as Node;
+		if (filterDropdowns.some((dropdown) => dropdown.contains(target))) return;
+		for (const dropdown of filterDropdowns) dropdown.open = false;
 	});
 
 	loadMoreButton?.addEventListener('click', renderNextPage);
@@ -468,6 +525,9 @@ const suggestions = Array.from(
 				searchInput.blur();
 			}
 		}
+		if (event.key === 'Escape') {
+			for (const dropdown of filterDropdowns) dropdown.open = false;
+		}
 	});
 
 	const initialQuery = new URL(window.location.href).searchParams.get('q') ?? '';
@@ -480,6 +540,27 @@ const suggestions = Array.from(
 </script>
 
 <style is:global>
+	#site-search summary::-webkit-details-marker {
+		display: none;
+	}
+
+	#site-search details[open] > summary .filter-chevron {
+		transform: rotate(180deg);
+	}
+
+	#site-search [data-filter-name]:checked + span .filter-check {
+		opacity: 1;
+	}
+
+	#site-search .filter-dropdown[open] > summary {
+		border-color: #fb923c;
+		box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.08);
+	}
+
+	.dark #site-search .filter-dropdown[open] > summary {
+		border-color: #c2410c;
+	}
+
 	#site-search mark {
 		border-radius: 0.2rem;
 		background: color-mix(in srgb, #fb923c 22%, transparent);

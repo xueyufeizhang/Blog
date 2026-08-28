@@ -17,7 +17,7 @@ const searchDate = new Date(frontmatter.updatedDate ?? frontmatter.pubDate).toIS
   
   <Section>
 
-    <div class="mb-5 w-full sm:mb-8">
+    <div class="mb-7 w-full sm:mb-10">
       <PostHeader
         title={frontmatter.title}
         author={frontmatter.author}
@@ -33,9 +33,9 @@ const searchDate = new Date(frontmatter.updatedDate ?? frontmatter.pubDate).toIS
       />
     </div>
 
-    <div class="flex items-start gap-5">
+    <div class="flex items-start gap-8">
       
-      <main class="min-w-0 grow">
+      <main class="mx-auto w-full min-w-0 max-w-3xl grow">
         
         <article class="content" data-pagefind-body>
           
@@ -61,12 +61,12 @@ const searchDate = new Date(frontmatter.updatedDate ?? frontmatter.pubDate).toIS
           <PostContent><slot /></PostContent>
         </article>
 
-        <div class="mt-10 sm:mt-8">
+        <div class="mt-14 border-t border-stone-200 pt-8 dark:border-stone-800 sm:mt-16">
             <GiscusLoader />
         </div>
       </main>
 
-      <aside class="hidden lg:block w-60 shrink-0 sticky mt-11 top-13">
+      <aside class="sticky top-20 hidden w-56 shrink-0 lg:block" data-post-toc>
         <TableOfContents />
       </aside>
 

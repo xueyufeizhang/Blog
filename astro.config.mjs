@@ -11,11 +11,14 @@ import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import pagefind from 'astro-pagefind';
 const options = {
-    // Specify the theme to use or a custom theme json, in our case
-    // it will be a moonlight-II theme from
-    // https://github.com/atomiks/moonlight-vscode-theme/blob/master/src/moonlight-ii.json
-    // Callbacks to customize the output of the nodes
-    //theme: json,
+    theme: {
+        light: 'github-light',
+        dark: 'github-dark'
+    },
+    keepBackground: false,
+    defaultLang: {
+        block: 'plaintext'
+    },
     onVisitLine(node) {
         // Prevent lines from collapsing in `display: grid` mode, and
         // allow empty lines to be copy/pasted

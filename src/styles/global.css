@@ -4,81 +4,471 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Tailwind doesn't fully support some of the complex CSS selectors needed for code highlighting,
-so we need to keep some custom CSS but applied through Tailwind's plugin system
-These styles are for code highlighting that can't be easily implemented with just Tailwind */
-@layer utilities {
-    .content pre {
-        @apply p-0;
-    }
+[data-post-toc][hidden] {
+    display: none !important;
+}
 
-    .content code {
-        @apply overflow-x-auto;
-    }
+/* Technical note reading surface */
+.note-content {
+    --note-text: #44403c;
+    --note-muted: #78716c;
+    --note-border: #d6d3d1;
+    --note-soft: rgba(255, 255, 255, 0.54);
+    color: var(--note-text);
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 1rem;
+    line-height: 1.9;
+    text-wrap: pretty;
+}
 
-    .content [data-rehype-pretty-code-figure] code {
-        @apply p-0;
-    }
+.dark .note-content {
+    --note-text: #d6d3d1;
+    --note-muted: #a8a29e;
+    --note-border: #44403c;
+    --note-soft: rgba(41, 37, 36, 0.46);
+}
 
-    .content pre > code span[data-line] {
-        @apply border-l-8 border-transparent px-2;
-    }
+.note-content > :first-child {
+    margin-top: 0;
+}
 
-    .content pre > code span:first-of-type {
-        @apply rounded-t-lg pt-2;
-    }
+.note-content p,
+.note-content li {
+    color: var(--note-text);
+}
 
-    .content pre > code span:last-of-type {
-        @apply rounded-b-lg pb-2;
-    }
+.note-content p {
+    margin-block: 1.15rem;
+}
 
-    .content pre > code .highlighted {
-        @apply border-l-8 !border-gray-300/60 bg-gray-200/5;
-    }
+.note-content h2,
+.note-content h3,
+.note-content h4,
+.note-content h5,
+.note-content h6 {
+    color: #1c1917;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", monospace;
+    font-weight: 750;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+}
 
-    .content pre > code[data-line-numbers] {
-        counter-reset: line;
-    }
+.dark .note-content h2,
+.dark .note-content h3,
+.dark .note-content h4,
+.dark .note-content h5,
+.dark .note-content h6 {
+    color: #fafaf9;
+}
 
-    .content pre > code[data-line-numbers] > span[data-line]::before {
-        counter-increment: line;
-        content: counter(line);
-        @apply mr-8 inline-block w-4 text-left text-[#7ca2dfad];
-    }
+.note-content h2 {
+    margin-top: 3.6rem;
+    margin-bottom: 1.35rem;
+    border-bottom: 1px solid var(--note-border);
+    padding-bottom: 0.7rem;
+    font-size: clamp(1.45rem, 4vw, 1.75rem);
+    line-height: 1.3;
+}
 
-    .content pre > code > span[data-line]::before {
-        content: '';
-        @apply inline-block w-4 text-right;
-    }
+.note-content h3 {
+    margin-top: 2.8rem;
+    margin-bottom: 1rem;
+    font-size: clamp(1.2rem, 3vw, 1.38rem);
+    line-height: 1.4;
+}
 
-    .content pre > code[data-line-numbers-max-digits='2'] > span[data-line]::before {
-        @apply w-8;
-    }
+.note-content h4 {
+    margin-top: 2.25rem;
+    margin-bottom: 0.8rem;
+    font-size: 1.08rem;
+    line-height: 1.5;
+}
 
-    .content code[data-line-numbers-max-digits='3'] > span[data-line]::before {
-        @apply w-12;
-    }
+.note-content h5,
+.note-content h6 {
+    margin-top: 1.8rem;
+    margin-bottom: 0.65rem;
+    font-size: 0.98rem;
+    line-height: 1.55;
+}
+
+.note-content :is(h2, h3, h4, h5, h6) > a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.note-content a:not(:is(h2, h3, h4, h5, h6) a) {
+    color: #c2410c;
+    font-weight: 600;
+    text-decoration-color: rgba(234, 88, 12, 0.35);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    transition: color 160ms ease, text-decoration-color 160ms ease;
+}
+
+.note-content a:not(:is(h2, h3, h4, h5, h6) a):hover {
+    color: #ea580c;
+    text-decoration-color: currentColor;
+}
+
+.dark .note-content a:not(:is(h2, h3, h4, h5, h6) a) {
+    color: #fb923c;
+}
+
+.note-content strong {
+    color: #292524;
+    font-weight: 700;
+}
+
+.dark .note-content strong {
+    color: #f5f5f4;
+}
+
+.note-content :is(ul, ol) {
+    margin-block: 1.15rem;
+    padding-inline-start: 1.4rem;
+}
+
+.note-content li {
+    margin-block: 0.42rem;
+    padding-inline-start: 0.2rem;
+}
+
+.note-content li::marker {
+    color: #ea580c;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-weight: 700;
+}
+
+.note-content blockquote {
+    margin-block: 1.75rem;
+    border: 1px solid var(--note-border);
+    border-left: 3px solid #f97316;
+    border-radius: 0 0.75rem 0.75rem 0;
+    background: var(--note-soft);
+    padding: 0.8rem 1.2rem;
+    color: var(--note-text);
+    font-style: normal;
+    box-shadow: 0 1px 2px rgba(28, 25, 23, 0.025);
+}
+
+.note-content blockquote p {
+    margin-block: 0.45rem;
+}
+
+.note-content hr {
+    margin-block: 3rem;
+    border-color: var(--note-border);
+}
+
+.note-content img {
+    height: auto;
+    margin-block: 1.8rem;
+    border: 1px solid var(--note-border);
+    border-radius: 0.8rem;
+    box-shadow: 0 10px 30px rgba(28, 25, 23, 0.08);
+}
+
+.dark .note-content img {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.24);
+}
+
+.note-content table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin-block: 1.8rem;
+    overflow-x: auto;
+    border: 1px solid var(--note-border);
+    border-radius: 0.75rem;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.note-content th {
+    background: rgba(231, 229, 228, 0.72);
+    color: #292524;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.035em;
+}
+
+.dark .note-content th {
+    background: rgba(68, 64, 60, 0.56);
+    color: #f5f5f4;
+}
+
+.note-content :is(th, td) {
+    border-right: 1px solid var(--note-border);
+    border-bottom: 1px solid var(--note-border);
+    padding: 0.7rem 0.9rem;
+}
+
+.note-content tr:last-child td {
+    border-bottom: 0;
+}
+
+.note-content :is(th, td):last-child {
+    border-right: 0;
+}
+
+/* Inline code */
+.note-content :not(pre) > code {
+    overflow-wrap: anywhere;
+    border: 1px solid rgba(234, 88, 12, 0.17);
+    border-radius: 0.36rem;
+    background: rgba(255, 237, 213, 0.7);
+    padding: 0.12em 0.4em;
+    color: #9a3412;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", monospace;
+    font-size: 0.88em;
+    font-weight: 650;
+    white-space: break-spaces;
+}
+
+.note-content :not(pre) > code::before,
+.note-content :not(pre) > code::after {
+    content: none;
+}
+
+.dark .note-content :not(pre) > code {
+    border-color: rgba(251, 146, 60, 0.2);
+    background: rgba(124, 45, 18, 0.28);
+    color: #fdba74;
+}
+
+/* Code block chrome */
+.note-content .code-block-shell {
+    margin-block: 1.8rem;
+    overflow: hidden;
+    border: 1px solid #30343b;
+    border-radius: 0.85rem;
+    background: #17191e;
+    box-shadow:
+        0 1px 2px rgba(28, 25, 23, 0.12),
+        0 12px 32px rgba(28, 25, 23, 0.1);
+}
+
+.dark .note-content .code-block-shell {
+    border-color: #3f3f46;
+    background: #121317;
+    box-shadow: 0 16px 38px rgba(0, 0, 0, 0.25);
+}
+
+.note-content .code-block-toolbar {
+    display: flex;
+    min-height: 2.7rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.075);
+    background: #202329;
+    padding: 0.55rem 0.72rem 0.55rem 0.9rem;
+    color: #a8a29e;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", monospace;
+}
+
+.dark .note-content .code-block-toolbar {
+    background: #1b1d22;
+}
+
+.note-content .code-block-identity,
+.note-content .code-block-dots,
+.note-content .code-copy-button {
+    display: flex;
+    align-items: center;
+}
+
+.note-content .code-block-identity {
+    min-width: 0;
+    gap: 0.85rem;
+}
+
+.note-content .code-block-dots {
+    gap: 0.32rem;
+}
+
+.note-content .code-block-dots i {
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 999px;
+    background: #57534e;
+}
+
+.note-content .code-block-dots i:first-child {
+    background: #c2410c;
+}
+
+.note-content .code-block-language {
+    overflow: hidden;
+    color: #a8a29e;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.note-content .code-copy-button {
+    display: flex;
+    min-height: 1.8rem;
+    flex: none;
+    align-items: center;
+    gap: 0.38rem;
+    border: 1px solid transparent;
+    border-radius: 0.45rem;
+    padding: 0.24rem 0.5rem;
+    color: #a8a29e;
+    font-size: 0.68rem;
+    font-weight: 650;
+    line-height: 1;
+    transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+
+.note-content .code-copy-button:hover {
+    border-color: rgba(255, 255, 255, 0.11);
+    background: rgba(255, 255, 255, 0.07);
+    color: #f5f5f4;
+}
+
+.note-content .code-copy-button:focus-visible {
+    outline: 2px solid #f97316;
+    outline-offset: 2px;
+}
+
+.note-content .code-copy-button.is-copied {
+    color: #86efac;
+}
+
+.note-content .code-copy-button svg {
+    width: 0.85rem;
+    height: 0.85rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.8;
+}
+
+.note-content .code-block-shell pre {
+    max-width: 100%;
+    margin: 0;
+    overflow-x: auto;
+    border: 0;
+    border-radius: 0;
+    background: transparent !important;
+    padding: 0;
+    scrollbar-color: #57534e transparent;
+    scrollbar-width: thin;
+}
+
+.note-content .code-block-shell pre::-webkit-scrollbar {
+    height: 0.55rem;
+}
+
+.note-content .code-block-shell pre::-webkit-scrollbar-thumb {
+    border: 2px solid #17191e;
+    border-radius: 999px;
+    background: #57534e;
+}
+
+.note-content .code-block-shell pre > code {
+    display: block;
+    width: max-content;
+    min-width: 100%;
+    border: 0;
+    background: transparent !important;
+    padding: 1.08rem 1.2rem;
+    color: #e7e5e4;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", monospace;
+    font-size: 0.84rem;
+    font-variant-ligatures: none;
+    font-weight: 450;
+    line-height: 1.72;
+    white-space: pre;
+}
+
+.note-content .code-block-shell pre > code:has(span[data-line]) {
+    padding-inline: 0;
+}
+
+.note-content .code-block-shell span[data-line] {
+    display: block;
+    min-height: 1.72em;
+    border-left: 3px solid transparent;
+    padding-inline: 1.15rem;
+}
+
+.note-content .code-block-shell span[data-line].highlighted {
+    border-left-color: #fb923c;
+    background: rgba(249, 115, 22, 0.09);
+}
+
+.note-content .code-block-shell code[data-line-numbers] {
+    counter-reset: line;
+}
+
+.note-content .code-block-shell code[data-line-numbers] > span[data-line]::before {
+    display: inline-block;
+    width: 2.5rem;
+    margin-right: 0.7rem;
+    color: #575d69;
+    content: counter(line);
+    counter-increment: line;
+    text-align: right;
+    user-select: none;
+}
+
+/* Code panels stay dark in both site themes, so use the dark token palette. */
+.note-content .code-block-shell [data-theme*=' '] span {
+    color: var(--shiki-dark);
 }
 
 @media (max-width: 639px) {
-    .content {
+    .note-content {
         overflow-wrap: anywhere;
+        font-size: 0.96rem;
+        line-height: 1.82;
     }
 
-    .content table {
-        display: block;
-        max-width: 100%;
-        overflow-x: auto;
-        white-space: nowrap;
+    .note-content h2 {
+        margin-top: 3rem;
     }
 
-    .content pre,
-    .content [data-rehype-pretty-code-figure] {
-        max-width: 100%;
+    .note-content h3 {
+        margin-top: 2.35rem;
     }
 
-    .content img,
-    .content video {
+    .note-content .code-block-shell {
+        margin-inline: -0.15rem;
+        border-radius: 0.72rem;
+    }
+
+    .note-content .code-block-shell pre > code {
+        padding: 0.95rem 1rem;
+        font-size: 0.79rem;
+        line-height: 1.68;
+    }
+
+    .note-content .code-block-shell span[data-line] {
+        padding-inline: 0.95rem;
+    }
+
+    .note-content .code-copy-button {
+        min-width: 2rem;
+        justify-content: center;
+    }
+
+    .note-content img,
+    .note-content video {
         height: auto;
         max-width: 100%;
     }

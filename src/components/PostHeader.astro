@@ -36,24 +36,24 @@ const {
 const formattedDate = formatDate(pubDate);
 ---
 
-	<div class="flex flex-col items-center">
-		<div class="max-w-4xl py-3 text-center sm:px-4 sm:py-6">
-			<h1 class="break-words text-3xl font-bold leading-tight sm:text-4xl">{title}</h1>
+	<header class="flex flex-col items-center">
+		<div class="max-w-4xl py-2 text-center sm:px-4 sm:py-4">
+			<h1 class="break-words text-[clamp(1.8rem,5vw,2.5rem)] font-bold leading-[1.18] tracking-[-0.035em]">{title}</h1>
 		</div>
 
-		<div class="pb-4">
+		<div class="pb-3 pt-2">
 			<Tags tags={tags} withHref={true} />
 		</div>
 
 		{(type || status || language) && (
-			<div class="mb-4 flex flex-wrap items-center justify-center gap-2 text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400">
+			<div class="mb-3 flex flex-wrap items-center justify-center gap-2 text-[0.7rem] font-bold uppercase tracking-[0.12em] text-stone-500 dark:text-stone-400">
 				{type && <span>{formatPostLabel(type)}</span>}
 				{status && <span>· {formatPostLabel(status)}</span>}
 				{language && <span>· {language.toUpperCase()}</span>}
 			</div>
 		)}
 
-		<div class="flex flex-col items-center justify-center gap-2 text-center text-xs text-stone-500 dark:text-stone-400 sm:flex-row sm:flex-wrap sm:gap-3 sm:text-sm">
+		<div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-center text-xs text-stone-500 dark:text-stone-400 sm:text-sm">
 			
 			{/* 如果是置顶文章，显示橙色 Top 标记 */}
 			{isPinned && (
@@ -70,7 +70,7 @@ const formattedDate = formatDate(pubDate);
 
 			{updatedDate && <span>Updated {formatDate(updatedDate)}</span>}
 			
-			<span class="hidden opacity-30 sm:inline">|</span>
+			<span class="hidden h-3 w-px bg-stone-300 sm:inline dark:bg-stone-700" aria-hidden="true"></span>
 			
 			<span>{minutesRead}</span>
 		</div>
@@ -85,4 +85,4 @@ const formattedDate = formatDate(pubDate);
 				/>
 			</div>
 		) : null}
-	</div>
+	</header>
