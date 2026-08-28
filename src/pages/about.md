@@ -1,19 +1,26 @@
 ---
 layout: '@/layouts/markdown.astro'
-title: About
+title: About this space
 ---
 
-Hi, I'm Xueyufei, currently based in Turin. I'm interested in machine learning, large language models, data science, and the craft of turning things I learn into things I can explain.
+I'm Xueyufei, currently based in Turin. This site is a long-term archive for what I study, build, and want to remember—not a publication schedule or a polished personal brand.
 
-This site is my working notebook: part study log, part technical reference, and part record of the things I build along the way. Some posts are polished guides; others are notes that may evolve as my understanding does.
+## What belongs here
 
-## What you'll find here
+- Machine learning, deep learning, and LLM notes
+- Technical experiments and project records
+- Explanations rewritten in my own words
+- Ideas that are still incomplete but worth keeping
+- Occasional notes about language learning or daily life
 
-- Notes on machine learning and deep learning
-- LLM concepts, experiments, and practical workflows
-- Data science tools and small projects
-- Occasional writing about building and maintaining this site
+## Languages
 
-I'm still figuring out what this space will become. For now, the goal is simple: learn in public, write clearly, and leave useful traces for my future self and anyone following a similar path.
+Most technical notes are written in English because it is the language I use for study and exams. Some entries may be in Chinese, and Italian will appear as I continue learning it. The language of a note is part of its metadata, not a rule for the whole site.
 
-You can find my work on [GitHub](https://github.com/xueyufeizhang) or reach me at [contact@zxyf.it](mailto:contact@zxyf.it).
+## Notes can evolve
+
+Entries do not need to arrive fully formed. A **growing** note is still being revised; a **complete** note is stable enough for now. When an older note changes, its updated date brings it back into the “Recently updated” section on the homepage.
+
+The goal is simple: make useful traces easy to find again.
+
+You can find my work on [GitHub](https://github.com/xueyufeizhang), connect on [LinkedIn](https://www.linkedin.com/in/xueyufei-zhang-68919a2a6/), or reach me at [contact@zxyf.it](mailto:contact@zxyf.it).

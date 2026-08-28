@@ -23,6 +23,10 @@ const { frontmatter } = Astro.props;
         tags={frontmatter.tags}
         minutesRead={frontmatter.minutesRead}
         pubDate={frontmatter.pubDate}
+		updatedDate={frontmatter.updatedDate}
+		type={frontmatter.type}
+		status={frontmatter.status}
+		language={frontmatter.language}
         isPinned={frontmatter.isPinned}
         img={{ src: frontmatter.image.src, alt: frontmatter.image.alt }}
       />

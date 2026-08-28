@@ -4,6 +4,9 @@ pubDate: 2025-12-28
 description: "Study notes on risk, Bayes classifiers, empirical risk, and PAC learning."
 author: "Xueyufei Zhang"
 isPinned: false
+type: note
+status: growing
+language: en
 excerpt: "Learning theory notes covering true and empirical risk, the Bayes classifier, IID assumptions, and the intuition behind PAC learning."
 image:
   src:
@@ -131,7 +134,6 @@ $$
 h_S = \mathop{\arg\min}\limits_{h\in\mathcal{H}}\left(\frac{1}{m}\sum_{i=1}^m\mathbb{I}[h(x_i)\neq y_i]+\lambda\ \mathrm{Complexity}(h) \right)
 $$
 ![](20250308135811.png)
-
 
 
 

@@ -1,5 +1,5 @@
 ---
-import { formatDate } from '@/utils/data.util';
+import { formatDate, formatPostLabel } from '@/utils/data.util';
 import Section from './Section.astro';
 import Tags from './Tags.astro';
 // import PinnedBadge from './PinnedBadge.astro'; // 不再需要这个组件
@@ -10,6 +10,10 @@ interface Props {
 	tags: string[];
 	minutesRead: string;
 	pubDate: string;
+	updatedDate?: string;
+	type?: string;
+	status?: string;
+	language?: string;
 	isPinned?: boolean;
 	img: {
 		src: string;
@@ -17,7 +21,18 @@ interface Props {
 	};
 }
 
-const { title, pubDate, tags, minutesRead, img, isPinned = false } = Astro.props;
+const {
+	title,
+	pubDate,
+	updatedDate,
+	type,
+	status,
+	language,
+	tags,
+	minutesRead,
+	img,
+	isPinned = false
+} = Astro.props;
 
 const formattedDate = formatDate(pubDate);
 ---
@@ -32,6 +47,14 @@ const formattedDate = formatDate(pubDate);
 			<Tags tags={tags} withHref={true} />
 		</div>
 
+		{(type || status || language) && (
+			<div class="mb-4 flex flex-wrap items-center justify-center gap-2 text-xs font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400">
+				{type && <span>{formatPostLabel(type)}</span>}
+				{status && <span>· {formatPostLabel(status)}</span>}
+				{language && <span>· {language.toUpperCase()}</span>}
+			</div>
+		)}
+
 		<div class="flex flex-wrap items-center justify-center gap-4 text-sm text-stone-500 dark:text-stone-400">
 			
 			{/* 如果是置顶文章，显示橙色 Top 标记 */}
@@ -45,7 +68,9 @@ const formattedDate = formatDate(pubDate);
 				</span>
 			)}
 
-			<span>{formattedDate}</span>
+			<span>Created {formattedDate}</span>
+
+			{updatedDate && <span>· Updated {formatDate(updatedDate)}</span>}
 			
 			<span class="opacity-30">|</span>
 			

@@ -50,11 +50,7 @@ export default defineConfig({
     integrations: [react(), sitemap(), pagefind()],
     output: 'static',
 
-    adapter: vercelStatic({
-        webAnalytics: {
-            enabled: true
-        }
-    }),
+    adapter: vercelStatic(),
     vite: {
         plugins: [tailwindcss()]
     }

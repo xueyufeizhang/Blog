@@ -3,6 +3,15 @@ import { MarkdownInstance } from 'astro';
 export const isPublishedPost = (post: MarkdownInstance<any>) =>
 	post.frontmatter.draft !== true;
 
+export const getPostUpdatedDate = (post: MarkdownInstance<any>) =>
+	post.frontmatter.updatedDate ?? post.frontmatter.pubDate;
+
+export const sortPostsByUpdatedDate = (a: MarkdownInstance<any>, b: MarkdownInstance<any>) =>
+	new Date(getPostUpdatedDate(b)).getTime() - new Date(getPostUpdatedDate(a)).getTime();
+
+export const formatPostLabel = (value?: string) =>
+	value ? value.charAt(0).toUpperCase() + value.slice(1) : '';
+
 export const formatDate = (pubDate: string) => {
 	var options: Intl.DateTimeFormatOptions = {
 		weekday: 'short',

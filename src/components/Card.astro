@@ -1,5 +1,5 @@
 ---
-import { formatDate } from '@/utils/data.util';
+import { formatDate, formatPostLabel, getPostUpdatedDate } from '@/utils/data.util';
 import Tags from './Tags.astro';
 
 interface Props {
@@ -8,6 +8,8 @@ interface Props {
 
 const { post } = Astro.props;
 const isPinned = post.frontmatter.isPinned === true;
+const { type, status, language, updatedDate } = post.frontmatter;
+const displayDate = getPostUpdatedDate(post);
 
 const fileUrl = post.file;
 const slug = fileUrl.split('/').slice(-2, -1)[0]; 
@@ -32,7 +34,7 @@ const cleanUrl = `/posts/${slug}`; // 构建最终的浏览器访问路径
 								</svg>
 							</span>
 						)}
-						<p>{formatDate(post.frontmatter.pubDate)}</p>
+						<p>{updatedDate ? 'Updated ' : ''}{formatDate(displayDate)}</p>
 					</div>
 					<div>
 						<p class="font-bold">{post.frontmatter.minutesRead}</p>
@@ -41,6 +43,11 @@ const cleanUrl = `/posts/${slug}`; // 构建最终的浏览器访问路径
 
 				<p class="pb-4 text-lg font-bold">{post.frontmatter.title}</p>
 
+				<div class="flex flex-wrap gap-2 pb-3 text-[10px] font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400">
+					{type && <span>{formatPostLabel(type)}</span>}
+					{status && <span>· {formatPostLabel(status)}</span>}
+					{language && <span>· {language.toUpperCase()}</span>}
+				</div>
 				<Tags tags={post.frontmatter.tags} />
 				<p class="line-clamp-6 pt-4">{post.frontmatter.excerpt}</p>
 			</div>

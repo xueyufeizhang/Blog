@@ -1,0 +1,75 @@
+---
+import Base from '@/layouts/Base.astro';
+import Heading from '@/components/Heading.astro';
+import Section from '@/components/Section.astro';
+import { AppConfig } from '@/utils/AppConfig';
+import {
+	formatDate,
+	formatPostLabel,
+	getPostUpdatedDate,
+	isPublishedPost,
+	sortPostsByUpdatedDate
+} from '@/utils/data.util';
+import type { MarkdownInstance } from 'astro';
+
+const allPosts = Object.values(
+	import.meta.glob('../content/posts/**/index.md', { eager: true })
+) as MarkdownInstance<any>[];
+
+const publishedPosts = allPosts.filter(isPublishedPost).sort(sortPostsByUpdatedDate);
+const postsByYear = publishedPosts.reduce<Record<string, MarkdownInstance<any>[]>>((groups, post) => {
+	const year = String(new Date(getPostUpdatedDate(post)).getFullYear());
+	(groups[year] ??= []).push(post);
+	return groups;
+}, {});
+
+const years = Object.keys(postsByYear).sort((a, b) => Number(b) - Number(a));
+
+const getSlug = (post: MarkdownInstance<any>) => post.file.split('/').slice(-2, -1)[0];
+---
+
+<Base
+	head={{
+		title: `Archive | ${AppConfig.site_name}`,
+		description: 'A chronological archive of notes and project records.'
+	}}
+>
+	<Section>
+		<Heading title="Archive" />
+		<p class="mt-2 text-sm text-stone-500 dark:text-stone-400">
+			A chronological index ordered by the date each note was last changed.
+		</p>
+	</Section>
+
+	<Section>
+		<div class="space-y-10">
+			{
+				years.map((year) => (
+					<section aria-labelledby={`year-${year}`}>
+						<h2 id={`year-${year}`} class="mb-4 text-2xl font-bold">{year}</h2>
+						<ul class="divide-y divide-stone-300 border-y border-stone-300 dark:divide-stone-700 dark:border-stone-700">
+							{(postsByYear[year] ?? []).map((post) => {
+								const { title, type, status, language, updatedDate } = post.frontmatter;
+								return (
+									<li class="py-4">
+										<a class="group flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between" href={`/posts/${getSlug(post)}`}>
+											<span class="font-bold group-hover:text-orange-600">{title}</span>
+											<span class="shrink-0 text-xs text-stone-500 dark:text-stone-400">
+												{updatedDate ? 'Updated ' : ''}{formatDate(getPostUpdatedDate(post))}
+											</span>
+										</a>
+										<div class="mt-2 flex flex-wrap gap-2 text-[10px] font-bold uppercase tracking-wide text-stone-500 dark:text-stone-400">
+											{type && <span>{formatPostLabel(type)}</span>}
+											{status && <span>· {formatPostLabel(status)}</span>}
+											{language && <span>· {language.toUpperCase()}</span>}
+										</div>
+									</li>
+								);
+							})}
+						</ul>
+					</section>
+				))
+			}
+		</div>
+	</Section>
+</Base>

@@ -4,6 +4,9 @@ pubDate: 2025-12-27
 description: "A step-by-step guide to building and publishing a personal blog with GitHub and Hexo."
 author: "Xueyufei Zhang"
 isPinned: true
+type: guide
+status: complete
+language: zh
 excerpt: "A beginner-friendly walkthrough of setting up Hexo locally, connecting it to GitHub, and publishing a personal blog without managing your own server."
 image:
   src:

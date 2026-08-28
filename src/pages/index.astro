@@ -5,7 +5,7 @@ import Hero from '@/components/Hero.astro';
 import GitHubContributions from '@/components/GitHubActivityCalendar.astro';
 import LatestPosts from '@/components/LatestPosts.astro';
 import AllTags from '@/components/AllTags.astro';
-import { isPublishedPost, sortPostsByDate } from '@/utils/data.util';
+import { isPublishedPost, sortPostsByUpdatedDate } from '@/utils/data.util';
 import { MarkdownInstance } from 'astro';
 
 const { title } = AppConfig;
@@ -15,8 +15,8 @@ const allPosts = Object.values(
 	import.meta.glob('../content/posts/**/index.md', { eager: true })
 ) as MarkdownInstance<any>[];
 const publishedPosts = allPosts.filter(isPublishedPost);
-publishedPosts.sort(sortPostsByDate);
-const latestPosts = publishedPosts.slice(0, 3);
+publishedPosts.sort(sortPostsByUpdatedDate);
+const recentlyUpdatedPosts = publishedPosts.slice(0, 3);
 ---
 
 <Base head={{ title, description }}>
@@ -27,5 +27,10 @@ const latestPosts = publishedPosts.slice(0, 3);
 	</div>
 
 	<AllTags />
-	<LatestPosts posts={latestPosts} />
+	<LatestPosts
+		posts={recentlyUpdatedPosts}
+		heading="Recently updated"
+		href="/archive"
+		linkLabel="open archive →"
+	/>
 </Base>

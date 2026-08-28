@@ -1,100 +1,36 @@
 ---
-// This will be localhost during development, site URL in prod
-const origin = Astro.url.origin
 const giscusConfig = {
-    repo: 'xueyufeizhang/Blog',
-    repoId: 'R_kgDOQvd0aA',
-    category: 'Announcements',
-    categoryId: 'DIC_kwDOQvd0aM4C0ScC',
-    reactionsEnabled: true, // Enable reactions on post itself
-  }
-if (!giscusConfig) {
-  throw new Error('Giscus configuration is missing in site.config.ts')
-}
-const repo = giscusConfig.repo
-const repoId = giscusConfig.repoId
-const category = giscusConfig.category
-const categoryId = giscusConfig.categoryId
-const reactionsEnabled = giscusConfig.reactionsEnabled ? '1' : '0'
+	repo: 'xueyufeizhang/Blog',
+	repoId: 'R_kgDOQvd0aA',
+	category: 'Announcements',
+	categoryId: 'DIC_kwDOQvd0aM4C0ScC',
+	reactionsEnabled: true
+};
+
+const { repo, repoId, category, categoryId, reactionsEnabled } = giscusConfig;
 ---
 
-<div
-	class="giscus-shell rounded-xl border border-stone-300 p-5 dark:border-stone-700"
-	data-origin={origin}
+<div class="giscus"></div>
+<script
+	is:inline
+	src="https://giscus.app/client.js"
 	data-repo={repo}
 	data-repo-id={repoId}
 	data-category={category}
 	data-category-id={categoryId}
-	data-reactions-enabled={reactionsEnabled}
->
-	<p class="text-sm text-stone-600 dark:text-stone-400">
-		Comments are hosted by GitHub Discussions through giscus. Loading them connects your browser to giscus and GitHub. See the <a class="underline hover:text-orange-600" href="/privacy">privacy notice</a> for details.
-	</p>
-	<button
-		type="button"
-		class="load-comments mt-4 rounded-lg border border-stone-400 px-4 py-2 text-sm transition-colors hover:border-orange-600 hover:text-orange-600 dark:border-stone-600"
-	>
-		Load comments
-	</button>
-	<div class="giscus"></div>
-</div>
-<script>
-  function loadGiscus() {
-    const shell = document.querySelector<HTMLElement>('.giscus-shell')
-    const commentsTarget = shell?.querySelector<HTMLElement>('.giscus')
-    const button = shell?.querySelector<HTMLButtonElement>('.load-comments')
-    if (!shell || !commentsTarget || !button) {
-      return
-    }
-    const origin = shell.getAttribute('data-origin')
-    const repo = shell.getAttribute('data-repo')
-    const repoId = shell.getAttribute('data-repo-id')
-    const category = shell.getAttribute('data-category')
-    const categoryId = shell.getAttribute('data-category-id')
-    const reactionsEnabled = shell.getAttribute('data-reactions-enabled')
-    if (
-      !origin ||
-      !repo ||
-      !repoId ||
-      !category ||
-      !categoryId ||
-      !reactionsEnabled
-    ) {
-      return
-    }
-    button.disabled = true
-    button.textContent = 'Loading comments…'
-    const script = document.createElement('script')
-    script.src = 'https://giscus.app/client.js'
-    script.setAttribute('data-repo', repo)
-    script.setAttribute('data-repo-id', repoId)
-    script.setAttribute('data-category', category)
-    script.setAttribute('data-category-id', categoryId)
-    script.setAttribute('data-mapping', 'pathname')
-    script.setAttribute('data-strict', '0')
-    script.setAttribute('data-reactions-enabled', reactionsEnabled)
-    script.setAttribute('data-emit-metadata', '0')
-    script.setAttribute('data-input-position', 'top')
-    script.setAttribute('data-theme', 'preferred_color_scheme')
-    script.setAttribute('data-lang', 'en')
-    script.setAttribute('loading', 'lazy')
-    script.crossOrigin = 'anonymous'
-    script.async = true
-    script.addEventListener('load', () => {
-      button.remove()
-    })
-    script.addEventListener('error', () => {
-      button.disabled = false
-      button.textContent = 'Try loading comments again'
-    })
-    commentsTarget.appendChild(script)
-  }
-
-  document.querySelector<HTMLButtonElement>('.load-comments')?.addEventListener('click', loadGiscus)
-</script>
+	data-mapping="pathname"
+	data-strict="0"
+	data-reactions-enabled={reactionsEnabled ? '1' : '0'}
+	data-emit-metadata="0"
+	data-input-position="top"
+	data-theme="preferred_color_scheme"
+	data-lang="en"
+	crossorigin="anonymous"
+	async
+></script>
 
 <style is:global>
-  iframe.giscus-frame {
-    margin-block: 32px;
-  }
+	iframe.giscus-frame {
+		margin-block: 32px;
+	}
 </style>

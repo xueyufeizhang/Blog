@@ -6,15 +6,23 @@ import { MarkdownInstance } from 'astro';
 
 interface Props {
 	posts: MarkdownInstance<any>[];
+	heading?: string;
+	href?: string;
+	linkLabel?: string;
 }
 
-const { posts } = Astro.props;
+const {
+	posts,
+	heading = 'Latest notes',
+	href = '/posts',
+	linkLabel = 'browse all →'
+} = Astro.props;
 ---
 
 <Section>
 	<div class="flex justify-between items-center pb-4">
-		<Heading title="Latest notes" />
-		<a href="/posts" class="underline hover:text-orange-600">browse all →</a>
+		<Heading title={heading} />
+		<a href={href} class="underline hover:text-orange-600">{linkLabel}</a>
 	</div>
 	<div class="flex flex-col pb-4 md:flex-row">
 		{
