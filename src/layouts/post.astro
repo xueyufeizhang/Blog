@@ -33,9 +33,9 @@ const searchDate = new Date(frontmatter.updatedDate ?? frontmatter.pubDate).toIS
       />
     </div>
 
-    <div class="relative flex items-start gap-8" data-reading-layout>
+    <div class="relative grid items-start" data-reading-layout>
       
-      <main class="mx-auto w-full min-w-0 max-w-3xl grow">
+      <main class="col-start-1 row-start-1 mx-auto w-full min-w-0 max-w-3xl">
         
         <article class="content" data-pagefind-body>
           
@@ -66,27 +66,13 @@ const searchDate = new Date(frontmatter.updatedDate ?? frontmatter.pubDate).toIS
         </div>
       </main>
 
-      <aside class="sticky top-20 hidden w-56 shrink-0 lg:block" data-post-toc>
+      <aside
+        class="sticky top-20 col-start-1 row-start-1 hidden w-52 xl:block"
+        style="margin-left: calc(50% + 26rem);"
+        data-post-toc
+      >
         <TableOfContents />
       </aside>
-
-      <button
-        type="button"
-        data-toc-expand
-        hidden
-        class="absolute right-0 top-0 z-10 hidden min-h-10 items-center gap-2 rounded-xl border border-stone-300 bg-stone-100/90 px-3 text-xs font-bold text-stone-600 shadow-sm backdrop-blur-sm transition-colors hover:border-orange-400 hover:text-orange-600 lg:flex dark:border-stone-700 dark:bg-stone-900/90 dark:text-stone-300 dark:hover:border-orange-600 dark:hover:text-orange-400"
-        aria-controls="toc-list"
-        aria-expanded="false"
-        aria-label="Show table of contents"
-      >
-        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-          <path d="M8 6h12M8 12h12M8 18h12" stroke-linecap="round"></path>
-          <circle cx="4" cy="6" r="0.8" fill="currentColor" stroke="none"></circle>
-          <circle cx="4" cy="12" r="0.8" fill="currentColor" stroke="none"></circle>
-          <circle cx="4" cy="18" r="0.8" fill="currentColor" stroke="none"></circle>
-        </svg>
-        Contents
-      </button>
 
     </div>
 
