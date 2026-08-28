@@ -1,17 +1,10 @@
----
-import Section from './Section.astro';
-// 删除这里原本引用的 TableOfContents，因为布局层级已经提升到了 post.astro
----
-
-<Section>
-  <div class="relative">
-    <div
-      class="content prose dark:prose-invert prose-code:rounded-md prose-code:bg-orange-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-orange-700 prose-code:before:content-none prose-code:after:content-none dark:prose-code:bg-orange-900/30 dark:prose-code:text-orange-300 prose-img:rounded-lg prose-img:shadow-xl prose-img:dark:shadow-stone-800 mt-4 max-w-none text-base leading-8 text-black dark:text-white"
-    >
-      <slot />
-    </div>
+<div class="relative">
+  <div
+    class="content prose dark:prose-invert prose-code:rounded-md prose-code:bg-orange-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:text-orange-700 prose-code:before:content-none prose-code:after:content-none dark:prose-code:bg-orange-900/30 dark:prose-code:text-orange-300 prose-img:rounded-lg prose-img:shadow-xl prose-img:dark:shadow-stone-800 mt-3 max-w-none break-words text-[15px] leading-7 text-black dark:text-white sm:mt-4 sm:text-base sm:leading-8"
+  >
+    <slot />
   </div>
-</Section>
+</div>
 
 <style is:global>
   /* 保持原本的锚点偏移逻辑 */

@@ -1,6 +1,5 @@
 ---
 import { formatDate, formatPostLabel } from '@/utils/data.util';
-import Section from './Section.astro';
 import Tags from './Tags.astro';
 // import PinnedBadge from './PinnedBadge.astro'; // 不再需要这个组件
 
@@ -37,10 +36,9 @@ const {
 const formattedDate = formatDate(pubDate);
 ---
 
-<Section>
 	<div class="flex flex-col items-center">
-		<div class="px-4 py-6 text-center max-w-4xl">
-			<h1 class="text-4xl font-bold leading-tight">{title}</h1>
+		<div class="max-w-4xl py-3 text-center sm:px-4 sm:py-6">
+			<h1 class="break-words text-3xl font-bold leading-tight sm:text-4xl">{title}</h1>
 		</div>
 
 		<div class="pb-4">
@@ -55,7 +53,7 @@ const formattedDate = formatDate(pubDate);
 			</div>
 		)}
 
-		<div class="flex flex-wrap items-center justify-center gap-4 text-sm text-stone-500 dark:text-stone-400">
+		<div class="flex flex-col items-center justify-center gap-2 text-center text-xs text-stone-500 dark:text-stone-400 sm:flex-row sm:flex-wrap sm:gap-3 sm:text-sm">
 			
 			{/* 如果是置顶文章，显示橙色 Top 标记 */}
 			{isPinned && (
@@ -70,16 +68,16 @@ const formattedDate = formatDate(pubDate);
 
 			<span>Created {formattedDate}</span>
 
-			{updatedDate && <span>· Updated {formatDate(updatedDate)}</span>}
+			{updatedDate && <span>Updated {formatDate(updatedDate)}</span>}
 			
-			<span class="opacity-30">|</span>
+			<span class="hidden opacity-30 sm:inline">|</span>
 			
 			<span>{minutesRead}</span>
 		</div>
 
 		{/* 图片区域 */}
 		{img.src ? (
-			<div class="mt-8 w-full">
+			<div class="mt-6 w-full sm:mt-8">
 				<img 
 					src={img.src} 
 					alt={img.alt} 
@@ -88,4 +86,3 @@ const formattedDate = formatDate(pubDate);
 			</div>
 		) : null}
 	</div>
-</Section>

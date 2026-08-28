@@ -225,10 +225,11 @@ const height = labelHeight + (blockSize + blockMargin) * 7 - blockMargin
 
 <article
   id="github-activity-calendar"
-  class="w-max max-w-full flex flex-col gap-2 text-sm"
+  class="flex w-full max-w-full flex-col gap-2 text-sm"
 >
+	<p class="text-xs text-stone-500 dark:text-stone-400 sm:hidden">Swipe sideways to explore all 12 months →</p>
   <div
-    class="max-w-full overflow-x-auto pt-0.5"
+	class="max-w-full overflow-x-auto pb-2 pt-0.5"
     style={{
       // Don't cover the calendar with the scrollbar.
       scrollbarGutter: 'stable',

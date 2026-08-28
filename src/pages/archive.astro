@@ -42,16 +42,16 @@ const getSlug = (post: MarkdownInstance<any>) => post.file.split('/').slice(-2, 
 	</Section>
 
 	<Section>
-		<div class="space-y-10">
+		<div class="space-y-8 sm:space-y-10">
 			{
 				years.map((year) => (
 					<section aria-labelledby={`year-${year}`}>
-						<h2 id={`year-${year}`} class="mb-4 text-2xl font-bold">{year}</h2>
+						<h2 id={`year-${year}`} class="mb-3 text-xl font-bold sm:mb-4 sm:text-2xl">{year}</h2>
 						<ul class="divide-y divide-stone-300 border-y border-stone-300 dark:divide-stone-700 dark:border-stone-700">
 							{(postsByYear[year] ?? []).map((post) => {
 								const { title, type, status, language, updatedDate } = post.frontmatter;
 								return (
-									<li class="py-4">
+									<li class="py-4 sm:py-5">
 										<a class="group flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between" href={`/posts/${getSlug(post)}`}>
 											<span class="font-bold group-hover:text-orange-600">{title}</span>
 											<span class="shrink-0 text-xs text-stone-500 dark:text-stone-400">

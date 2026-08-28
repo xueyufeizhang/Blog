@@ -5,22 +5,23 @@ const year = new Date();
 ---
 
 <Section>
-	<footer class="text-center">
-		<div class="pb-4">
-			<a class="underline hover:text-orange-600" href="/rss.xml">RSS</a> · <a
+	<footer class="text-center text-xs leading-6 sm:text-sm">
+		<nav aria-label="Footer" class="mb-3 flex flex-wrap justify-center gap-x-4 gap-y-1">
+			<a class="underline hover:text-orange-600" href="/rss.xml">RSS</a>
+			<a class="underline hover:text-orange-600" href="/imprint/">Legal & privacy</a>
+			<a class="underline hover:text-orange-600" href="/about">About</a>
+			<a class="underline hover:text-orange-600" href="/tags">Topics</a>
+		</nav>
+		<p>
+			© {year.getFullYear()} Xueyufei Zhang. Built with <a
 				class="underline hover:text-orange-600"
-				href="/imprint/">Legal & privacy</a
-			> · <a class="underline hover:text-orange-600" href="/about">About</a>
-			· <a class="underline hover:text-orange-600" href="/tags">Topics</a>
-		</div>
-		© {year.getFullYear()} Xueyufei Zhang. Built with <a
-			class="underline hover:text-orange-600"
-			href="https://github.com/withastro/astro"
-			target="_blank">Astro</a
-		> and adapted from <a
-			class="underline hover:text-orange-600"
-			href="https://github.com/nicdun/astro-tech-blog"
-			target="_blank">astro-tech-blog</a
-		>
+				href="https://github.com/withastro/astro"
+				target="_blank">Astro</a
+			> and adapted from <a
+				class="underline hover:text-orange-600"
+				href="https://github.com/nicdun/astro-tech-blog"
+				target="_blank">astro-tech-blog</a
+			>.
+		</p>
 	</footer>
 </Section>

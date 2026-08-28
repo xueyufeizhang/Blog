@@ -31,6 +31,12 @@ const { repo, repoId, category, categoryId, reactionsEnabled } = giscusConfig;
 
 <style is:global>
 	iframe.giscus-frame {
-		margin-block: 32px;
+		margin-block: 24px;
+	}
+
+	@media (min-width: 640px) {
+		iframe.giscus-frame {
+			margin-block: 32px;
+		}
 	}
 </style>

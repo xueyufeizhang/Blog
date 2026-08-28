@@ -22,9 +22,11 @@ const recentlyUpdatedPosts = publishedPosts.slice(0, 3);
 <Base head={{ title, description }}>
 	<Hero />
 
-	<div class="flex justify-center items-center my-6 md:mx-2">
-		<GitHubContributions username="xueyufeizhang" recentMonths={12} />
-	</div>
+	<section aria-label="GitHub activity">
+		<div class="mx-auto my-3 w-full max-w-screen-lg px-5 sm:my-6 sm:px-4">
+			<GitHubContributions username="xueyufeizhang" recentMonths={12} />
+		</div>
+	</section>
 
 	<AllTags />
 	<LatestPosts

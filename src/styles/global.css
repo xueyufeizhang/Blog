@@ -59,3 +59,34 @@ These styles are for code highlighting that can't be easily implemented with jus
         @apply w-12;
     }
 }
+
+@media (max-width: 639px) {
+    .content {
+        overflow-wrap: anywhere;
+    }
+
+    .content table {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .content pre,
+    .content [data-rehype-pretty-code-figure] {
+        max-width: 100%;
+    }
+
+    .content img,
+    .content video {
+        height: auto;
+        max-width: 100%;
+    }
+
+    .katex-display {
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 0.25rem;
+    }
+}
