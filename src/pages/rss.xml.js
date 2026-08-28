@@ -1,12 +1,14 @@
 import rss from '@astrojs/rss';
+import { AppConfig } from '@/utils/AppConfig';
+import { isPublishedPost } from '@/utils/data.util';
 
 export async function GET(context) {
   const postImportResult = import.meta.glob('../content/posts/**/index.md', { eager: true });
-  const posts = Object.values(postImportResult);
+  const posts = Object.values(postImportResult).filter(isPublishedPost);
 
   return rss({
-    title: "Arvin's Blog",
-    description: "A blog sharing my study path for LLMs.",
+    title: AppConfig.site_name,
+    description: AppConfig.description,
     site: context.site,
     stylesheet: './rss/styles.xsl', // 确保 public 目录下有这个文件
     items: posts.map((post) => {

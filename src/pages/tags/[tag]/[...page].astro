@@ -6,22 +6,23 @@ import Heading from '@/components/Heading.astro';
 import Pagination from '@/components/Pagination.astro'; // 引入分页组件
 import { AppConfig } from '@/utils/AppConfig';
 import { MarkdownInstance } from 'astro';
-import { sortPostsByDate } from '@/utils/data.util';
+import { isPublishedPost, sortPostsByDate } from '@/utils/data.util';
 
 export async function getStaticPaths() {
   const PER_PAGE = 5; // 每页显示数量
   const allPosts = Object.values(
     import.meta.glob('../../../content/posts/**/index.md', { eager: true })
   ) as MarkdownInstance<any>[];
+  const publishedPosts = allPosts.filter(isPublishedPost);
 
   // 1. 获取所有标签
   const allTags = new Set(
-    allPosts.map((post) => post.frontmatter.tags).flat()
+    publishedPosts.map((post) => post.frontmatter.tags).flat()
   );
 
   // 2. 为每个标签生成分页路径
   return [...allTags].flatMap((tag) => {
-    const filteredPosts = allPosts
+    const filteredPosts = publishedPosts
       .filter((post) => post.frontmatter.tags.includes(tag))
       .sort(sortPostsByDate);
 
@@ -55,7 +56,7 @@ const { description } = AppConfig;
 
 <Base head={{ title: `${tag} - Page ${currentPage}`, description }}>
   <Section>
-    <Heading title={`Posts with #${tag}`} />
+    <Heading title={`Notes tagged #${tag}`} />
     <div class="pt-2 text-center">
       <a href="/tags" class="underline hover:text-orange-600">all tags →</a>
     </div>

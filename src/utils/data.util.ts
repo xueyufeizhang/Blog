@@ -1,5 +1,8 @@
 import { MarkdownInstance } from 'astro';
 
+export const isPublishedPost = (post: MarkdownInstance<any>) =>
+	post.frontmatter.draft !== true;
+
 export const formatDate = (pubDate: string) => {
 	var options: Intl.DateTimeFormatOptions = {
 		weekday: 'short',

@@ -5,7 +5,6 @@ import Section from '@/components/Section.astro'; // 引入 Section 确保逻辑
 import { AppConfig } from '@/utils/AppConfig';
 import 'katex/dist/katex.min.css';
 import '@/styles/global.css';
-import PostHog from '@/components/posthog.astro';
 
 export interface Props {
 	head: {
@@ -22,7 +21,7 @@ const { pathname } = Astro.url;
 const isHomePage = pathname === "/";
 ---
 
-<html lang="en" class="scroll-smooth">
+<html lang={AppConfig.locale} class="scroll-smooth">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -30,13 +29,12 @@ const isHomePage = pathname === "/";
 		<meta name="description" content={description} />
 		<meta name="author" content={AppConfig.author} />
 
-		<link rel="sitemap" href="/404.astro" />
+		<link rel="sitemap" href="/sitemap-index.xml" />
 		<link rel="alternate" type="application/rss+xml" href="/rss.xml" />
 		<link
 			rel="icon"
 			href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>"
 		/>
-		<PostHog />
 	</head>
 	<body
 		class="flex min-h-screen flex-col bg-stone-100 font-mono text-gray-950 dark:bg-stone-900 dark:text-white"

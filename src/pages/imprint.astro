@@ -1,42 +1,29 @@
 ---
-import Section from '@/components/Section.astro';
-import Base from '@/layouts/Base.astro';
-import { AppConfig } from '@/utils/AppConfig';
-import Heading from '@/components/Heading.astro';
-
-const { title, description } = AppConfig;
+import LegalPage from '@/components/LegalPage.astro';
 ---
 
-<Base head={{ title: `Legal Notice - ${title}`, description }}>
+<LegalPage
+	title="Legal information"
+	description="Operator and policy information for zxyf.it."
+	lastUpdated="28 August 2026"
+>
+	<h2>Site operator</h2>
+	<ul>
+		<li><strong>Name:</strong> Xueyufei Zhang</li>
+		<li><strong>Location:</strong> Turin, Italy</li>
+		<li><strong>Email:</strong> <a href="mailto:contact@zxyf.it">contact@zxyf.it</a></li>
+		<li><strong>Website:</strong> <a href="https://zxyf.it">https://zxyf.it</a></li>
+		<li><strong>Nature of the site:</strong> Personal, non-commercial blog and learning notebook</li>
+	</ul>
 
-	<Section><Heading title="Policy" /></Section>
+	<h2>Policies</h2>
+	<ul>
+		<li><a href="/privacy">Privacy notice</a></li>
+		<li><a href="/terms">Terms of use</a></li>
+		<li><a href="/disclaimer">Disclaimer</a></li>
+	</ul>
 
-	<Section>
-		<div class="text-sm">
-			<!-- <p class="pt-6 text-4xl font-bold">Policy</p> -->
-			
-			<p class="pt-0 pb-2 text-2xl font-bold">Mandatory Information (as per Italian D. Lgs. 70/2003)</p>
-			<Section>
-			<p class="space-y-1">
-        		<p class="text-lg"><strong>Operator:</strong> Xueyufei Zhang</p>
-        		<p class="text-lg"><strong>Location:</strong> Torino, Italy</p>
-				<p class="text-lg"><strong>Email:</strong> <a class="underline hover:text-orange-600" href="mailto:contact@zxyf.it">contact@zxyf.it</a></p>
-        		<p class="text-lg"><strong>Website URL:</strong> <a class="underline hover:text-orange-600" href={Astro.site}>{Astro.site}</a></p>
-      		</p>
-			</Section>
-		</div>
-
-		<p class="pt-5 pb-2 text-2xl font-bold">Policy Documentation</p>
-
-		<Section>
-    		<p class="space-y-1">
-        		<p class="text-lg"><a class="underline hover:text-orange-600" href="/privacy"><strong>Privacy Policy</strong></a></p>
-				<p class="py-2"></p>
-        		<p class="text-lg"><a class="underline hover:text-orange-600" href="/terms"><strong>Terms & Conditions</strong></a></p>
-				<p class="py-2"></p>
-				<p class="text-lg"><a class="underline hover:text-orange-600" href="/disclaimer"><strong>Disclaimer</strong></a></p>
-      		</p>
-  		</Section>
-
-	</Section>
-</Base>
+	<p class="legal-note">
+		These pages are written to describe the site's current implementation in plain language. They have not been reviewed by a lawyer and should be professionally reviewed if the site becomes commercial, adds accounts or a newsletter, accepts payments, or introduces advertising or additional tracking.
+	</p>
+</LegalPage>

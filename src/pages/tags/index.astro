@@ -4,6 +4,7 @@ import Section from '@/components/Section.astro';
 import Base from '@/layouts/Base.astro';
 import { AppConfig } from '@/utils/AppConfig';
 import { MarkdownInstance } from 'astro';
+import { isPublishedPost } from '@/utils/data.util';
 
 const { title, description } = AppConfig;
 
@@ -11,8 +12,9 @@ const { title, description } = AppConfig;
 const allPosts = Object.values(
 	import.meta.glob('../../content/posts/**/index.md', { eager: true })
 ) as MarkdownInstance<any>[];
+const publishedPosts = allPosts.filter(isPublishedPost);
 
-const allTags = allPosts.map((post) => post.frontmatter.tags).flat();
+const allTags = publishedPosts.map((post) => post.frontmatter.tags).flat();
 const uniqueTags = [...new Set(allTags)];
 
 // 2. 统计每个标签的数量并按数量从高到低排序 [cite: 32, 33]
@@ -30,7 +32,7 @@ const tagMap = uniqueTags
 	<p class="py-2"></p>
 	<p class="py-2"></p>
     <p class="text-muted-foreground mt-2 text-center text-sm">
-      Discover {tagMap.length} topics across {allPosts.length} posts
+      Browse {tagMap.length} topics across {publishedPosts.length} notes
     </p>
   </Section>
 
@@ -77,9 +79,4 @@ const tagMap = uniqueTags
       transform: translateY(0);
     }
   }
-
-  /* 让每个标签错开一点时间显示 */
-  {tagMap.map((_, i) => `
-    a:nth-child(${i + 1}) { animation-delay: ${i * 0.05}s; }
-  `)}
 </style>

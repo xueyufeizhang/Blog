@@ -1,10 +1,10 @@
 ---
 title: "GitHub+Hexo搭建自己的私人博客（超详细版）"
 pubDate: 2025-12-27
-description: "This is the third post of my new Astro blog."
+description: "A step-by-step guide to building and publishing a personal blog with GitHub and Hexo."
 author: "Xueyufei Zhang"
 isPinned: true
-excerpt: Love you.
+excerpt: "A beginner-friendly walkthrough of setting up Hexo locally, connecting it to GitHub, and publishing a personal blog without managing your own server."
 image:
   src:
   alt:

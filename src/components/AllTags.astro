@@ -3,14 +3,16 @@ import { MarkdownInstance } from 'astro';
 import Section from './Section.astro';
 import Heading from './Heading.astro';
 import Tag from './Tag.astro';
+import { isPublishedPost } from '@/utils/data.util';
 
 const allPosts = Object.values(
 	import.meta.glob('../content/posts/**/index.md', { eager: true })
 ) as MarkdownInstance<any>[];
+const publishedPosts = allPosts.filter(isPublishedPost);
 
 // Extract all unique tags from posts
 const allTagsSet: Set<string> = new Set(
-	allPosts
+	publishedPosts
 		.map((post: MarkdownInstance<Record<string, any>>) => post.frontmatter.tags)
 		.flat()
 		.filter(Boolean)
@@ -21,7 +23,6 @@ const allTags = Array.from(allTagsSet).sort();
 
 <Section>
 	<Heading title="Tags" />
-    <!-- <p class="text-xl font-bold"># Latest Posts</p> -->
 	<div class="flex flex-wrap gap-2 pt-4">
 		{
 			allTags.map((tag: string) => (

@@ -1,10 +1,10 @@
 ---
 title: "ML&DL Notes: Learning Theory"
 pubDate: 2025-12-28
-description: "This is the third post of my new Astro blog."
+description: "Study notes on risk, Bayes classifiers, empirical risk, and PAC learning."
 author: "Xueyufei Zhang"
 isPinned: false
-excerpt: Love you.
+excerpt: "Learning theory notes covering true and empirical risk, the Bayes classifier, IID assumptions, and the intuition behind PAC learning."
 image:
   src:
   alt:
@@ -131,7 +131,6 @@ $$
 h_S = \mathop{\arg\min}\limits_{h\in\mathcal{H}}\left(\frac{1}{m}\sum_{i=1}^m\mathbb{I}[h(x_i)\neq y_i]+\lambda\ \mathrm{Complexity}(h) \right)
 $$
 ![](20250308135811.png)
-
 
 
 

@@ -19,28 +19,39 @@ const reactionsEnabled = giscusConfig.reactionsEnabled ? '1' : '0'
 ---
 
 <div
-  class="giscus"
-  data-origin={origin}
-  data-repo={repo}
-  data-repo-id={repoId}
-  data-category={category}
-  data-category-id={categoryId}
-  data-reactions-enabled={reactionsEnabled}
+	class="giscus-shell rounded-xl border border-stone-300 p-5 dark:border-stone-700"
+	data-origin={origin}
+	data-repo={repo}
+	data-repo-id={repoId}
+	data-category={category}
+	data-category-id={categoryId}
+	data-reactions-enabled={reactionsEnabled}
 >
+	<p class="text-sm text-stone-600 dark:text-stone-400">
+		Comments are hosted by GitHub Discussions through giscus. Loading them connects your browser to giscus and GitHub. See the <a class="underline hover:text-orange-600" href="/privacy">privacy notice</a> for details.
+	</p>
+	<button
+		type="button"
+		class="load-comments mt-4 rounded-lg border border-stone-400 px-4 py-2 text-sm transition-colors hover:border-orange-600 hover:text-orange-600 dark:border-stone-600"
+	>
+		Load comments
+	</button>
+	<div class="giscus"></div>
 </div>
 <script>
   function loadGiscus() {
-    const giscusDiv = document.querySelector('.giscus')
-    if (!giscusDiv) {
-      throw new Error('Giscus div not found in the document.')
+    const shell = document.querySelector<HTMLElement>('.giscus-shell')
+    const commentsTarget = shell?.querySelector<HTMLElement>('.giscus')
+    const button = shell?.querySelector<HTMLButtonElement>('.load-comments')
+    if (!shell || !commentsTarget || !button) {
+      return
     }
-    const origin = giscusDiv.getAttribute('data-origin')
-    const repo = giscusDiv.getAttribute('data-repo')
-    const repoId = giscusDiv.getAttribute('data-repo-id')
-    const category = giscusDiv.getAttribute('data-category')
-    const categoryId = giscusDiv.getAttribute('data-category-id')
-    const reactionsEnabled = giscusDiv.getAttribute('data-reactions-enabled')
-    // const theme = document.documentElement.getAttribute('data-theme')
+    const origin = shell.getAttribute('data-origin')
+    const repo = shell.getAttribute('data-repo')
+    const repoId = shell.getAttribute('data-repo-id')
+    const category = shell.getAttribute('data-category')
+    const categoryId = shell.getAttribute('data-category-id')
+    const reactionsEnabled = shell.getAttribute('data-reactions-enabled')
     if (
       !origin ||
       !repo ||
@@ -49,8 +60,10 @@ const reactionsEnabled = giscusConfig.reactionsEnabled ? '1' : '0'
       !categoryId ||
       !reactionsEnabled
     ) {
-      throw new Error('Giscus configuration missing in the Giscus div.')
+      return
     }
+    button.disabled = true
+    button.textContent = 'Loading comments…'
     const script = document.createElement('script')
     script.src = 'https://giscus.app/client.js'
     script.setAttribute('data-repo', repo)
@@ -61,57 +74,23 @@ const reactionsEnabled = giscusConfig.reactionsEnabled ? '1' : '0'
     script.setAttribute('data-strict', '0')
     script.setAttribute('data-reactions-enabled', reactionsEnabled)
     script.setAttribute('data-emit-metadata', '0')
-    // Setting this to 'bottom' doesn't work. Not sure why.
     script.setAttribute('data-input-position', 'top')
-    // script.setAttribute('data-theme', `${origin}/giscus/${theme}.css`)
     script.setAttribute('data-theme', 'preferred_color_scheme')
     script.setAttribute('data-lang', 'en')
     script.setAttribute('loading', 'lazy')
     script.crossOrigin = 'anonymous'
     script.async = true
-    document.body.appendChild(script)
-  }
-  async function updateTheme(theme: string) {
-    console.log('Updating Giscus theme to:', theme)
-    let giscusFrame
-    // Try to find the Giscus iframe 3 times, in case it takes a moment to load
-    for (let i = 0; i < 3; i++) {
-      giscusFrame = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame')
-      if (giscusFrame) break
-      console.log('Giscus iframe not found, retrying...')
-      // Wait a moment before trying again
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-    }
-    // If the iframe is still not found, log an error and return
-    if (!giscusFrame) {
-      console.error('Giscus iframe not found after retries')
-      return
-    }
-    giscusFrame.contentWindow?.postMessage(
-      { giscus: { setConfig: { theme: `${origin}/giscus/${theme}.css` } } },
-      'https://giscus.app',
-    )
-  }
-  function listenForThemeChange() {
-    // Listen for changes to the data-theme attribute of the html element
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach(async (mutation) => {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
-          const newTheme = document.documentElement.getAttribute('data-theme')
-          if (newTheme) {
-            await updateTheme(newTheme)
-          }
-        }
-      })
+    script.addEventListener('load', () => {
+      button.remove()
     })
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
+    script.addEventListener('error', () => {
+      button.disabled = false
+      button.textContent = 'Try loading comments again'
     })
+    commentsTarget.appendChild(script)
   }
-  // Load Giscus script with correct theme and listen for theme changes
-  loadGiscus()
-  listenForThemeChange()
+
+  document.querySelector<HTMLButtonElement>('.load-comments')?.addEventListener('click', loadGiscus)
 </script>
 
 <style is:global>

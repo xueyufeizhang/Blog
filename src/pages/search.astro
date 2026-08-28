@@ -3,9 +3,10 @@ import Base from '@/layouts/Base.astro';
 import Section from '@/components/Section.astro';
 import Heading from '@/components/Heading.astro';
 import PagefindSearch from "node_modules/astro-pagefind/src/components/Search";
+import { AppConfig } from '@/utils/AppConfig';
 ---
 
-<Base head={{ title: "Search - Blog", description: "Search for posts" }}>
+<Base head={{ title: `Search | ${AppConfig.site_name}`, description: "Search Xueyufei's notes and posts" }}>
   <Section>
     <Heading title="Search" />
   </Section>
@@ -21,10 +22,10 @@ import PagefindSearch from "node_modules/astro-pagefind/src/components/Search";
           showSubResults: false,
           showEmptyFilters: false,
           translations: { 
-            placeholder: "Search posts...", 
+            placeholder: "Search notes and posts...",
             clear_search: "Clear",
             load_more: "Load more",
-            search_label: "Search posts",
+            search_label: "Search notes and posts",
             filters_label: "Filters",
             zero_results: "No results found for \"[SEARCH_TERM]\"",
             many_results: "Found [COUNT] results",

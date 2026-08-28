@@ -5,7 +5,7 @@ import Section from '@/components/Section.astro';
 import Card from '@/components/Card.astro';
 import Heading from '@/components/Heading.astro';
 import Pagination from '@/components/Pagination.astro';
-import { sortPostsByDate } from '@/utils/data.util';
+import { isPublishedPost, sortPostsByDate } from '@/utils/data.util';
 import type { MarkdownInstance } from 'astro';
 
 // 这里也可以保留一个，供 getStaticPaths 之外的代码使用（虽然此文件其他地方暂未用到）
@@ -18,9 +18,10 @@ export async function getStaticPaths() {
   const allPosts = Object.values(
     import.meta.glob('../../content/posts/**/index.md', { eager: true })
   ) as MarkdownInstance<any>[];
-  allPosts.sort(sortPostsByDate);
+  const publishedPosts = allPosts.filter(isPublishedPost);
+  publishedPosts.sort(sortPostsByDate);
 
-  const totalPages = Math.ceil(allPosts.length / PER_PAGE);
+  const totalPages = Math.ceil(publishedPosts.length / PER_PAGE);
 
   return Array.from({ length: Math.max(totalPages - 1, 0) }, (_, i) => {
     const page = i + 2;
@@ -31,7 +32,7 @@ export async function getStaticPaths() {
       props: {
         page,
         totalPages,
-        pageData: allPosts.slice(start, end),
+        pageData: publishedPosts.slice(start, end),
         title: AppConfig.title,
         description: AppConfig.description,
       },
@@ -43,7 +44,7 @@ const { page, totalPages, pageData, title, description } = Astro.props;
 ---
 
 <Base head={{ title: `${title} - Page ${page}`, description }}>
-  <Section><Heading title="Posts" /></Section>
+  <Section><Heading title="All notes" /></Section>
   
   <Section>
     {pageData.map((post: any) => (
