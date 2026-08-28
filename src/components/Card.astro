@@ -4,9 +4,10 @@ import Tags from './Tags.astro';
 
 interface Props {
 	post: any;
+	showReadingTime?: boolean;
 }
 
-const { post } = Astro.props;
+const { post, showReadingTime = true } = Astro.props;
 const isPinned = post.frontmatter.isPinned === true;
 const { type, status, language, updatedDate } = post.frontmatter;
 const displayDate = getPostUpdatedDate(post);
@@ -36,9 +37,11 @@ const cleanUrl = `/posts/${slug}`; // 构建最终的浏览器访问路径
 						)}
 						<p>{updatedDate ? 'Updated ' : ''}{formatDate(displayDate)}</p>
 					</div>
-					<div>
-						<p class="font-bold">{post.frontmatter.minutesRead}</p>
-					</div>
+					{showReadingTime && (
+						<div>
+							<p class="font-bold">{post.frontmatter.minutesRead}</p>
+						</div>
+					)}
 				</div>
 
 				<p class="pb-4 text-lg font-bold">{post.frontmatter.title}</p>
