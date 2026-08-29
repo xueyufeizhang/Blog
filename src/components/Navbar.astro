@@ -10,8 +10,9 @@ import Section from './Section.astro';
 			<div class="min-w-0 text-[1.15rem] font-bold sm:text-3xl">
 				<a href="/" class="flex items-center whitespace-nowrap"
 					><span class="pr-1 text-base text-gray-500 sm:pr-2 sm:text-2xl">{'<'}</span>xueyufei<span
-						class="text-orange-600">.</span
-					>zhang<span class="pl-1 text-base text-gray-500 sm:pl-2 sm:text-2xl">{'/>'}</span></a
+						class="brand-dot text-orange-600"
+						aria-hidden="true"></span><span class="sr-only">.</span>zhang<span
+						class="pl-1 text-base text-gray-500 sm:pl-2 sm:text-2xl">{'/>'}</span></a
 				>
 			</div>
 			<div class="flex items-center">
@@ -246,3 +247,24 @@ import Section from './Section.astro';
 		});
 	}
 </script>
+
+<style>
+	.brand-dot {
+		position: relative;
+		display: inline-block;
+		width: 1ch;
+		height: 1em;
+		flex: 0 0 1ch;
+	}
+
+	.brand-dot::after {
+		position: absolute;
+		bottom: 0.08em;
+		left: 50%;
+		width: 0.18em;
+		height: 0.18em;
+		transform: translateX(-50%);
+		background: currentColor;
+		content: '';
+	}
+</style>
