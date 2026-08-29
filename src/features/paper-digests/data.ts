@@ -2,10 +2,7 @@ import type { MarkdownInstance } from 'astro';
 
 export interface PaperDigestFrontmatter {
 	title: string;
-	titleZh: string;
 	pubDate: string | Date;
-	description: string;
-	descriptionZh: string;
 	paperCount: number;
 	generatedAt?: string;
 	language?: string;
@@ -42,17 +39,16 @@ export function getPaperDigestDate(digest: PaperDigest): Date {
 }
 
 function validatePaperDigest(digest: PaperDigest): PaperDigest {
-	const { title, titleZh, description, descriptionZh, paperCount, formatVersion } =
-		digest.frontmatter;
+	const { title, paperCount, formatVersion } = digest.frontmatter;
 
-	if (!title || !titleZh || !description || !descriptionZh) {
-		throw new Error(`Paper digest ${digest.file} must define bilingual titles and descriptions.`);
+	if (!title) {
+		throw new Error(`Paper digest ${digest.file} must define a title.`);
 	}
 	if (!Number.isInteger(paperCount) || paperCount < 0) {
 		throw new Error(`Paper digest ${digest.file} must define a non-negative paperCount.`);
 	}
-	if (formatVersion !== 2) {
-		throw new Error(`Paper digest ${digest.file} must use formatVersion 2.`);
+	if (formatVersion !== 3) {
+		throw new Error(`Paper digest ${digest.file} must use formatVersion 3.`);
 	}
 
 	getPaperDigestSlug(digest);
@@ -69,14 +65,6 @@ export function loadPaperDigests(): PaperDigest[] {
 
 export function formatPaperDigestDate(value: string | Date): string {
 	return new Date(value).toLocaleDateString('en-GB', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric'
-	});
-}
-
-export function formatPaperDigestDateZh(value: string | Date): string {
-	return new Date(value).toLocaleDateString('zh-CN', {
 		year: 'numeric',
 		month: 'long',
 		day: 'numeric'
