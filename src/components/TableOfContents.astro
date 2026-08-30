@@ -13,17 +13,17 @@ const { label = 'On this page' } = Astro.props;
 	>
 		{label}
 	</p>
-	<div class="border-l border-stone-300 dark:border-stone-700">
-		<ul id="toc-list" class="space-y-1.5"></ul>
+	<div class="toc-scroll" data-toc-scroll>
+		<div class="border-l border-stone-300 dark:border-stone-700">
+			<ul id="toc-list" class="space-y-1.5"></ul>
+		</div>
 	</div>
 </nav>
 
 <script>
-	// @ts-nocheck
-	/** @type {Set<number>} */
 	const levels = new Set([2, 3, 4]);
-	/** @param {string} text */
-	function slugify(text) {
+
+	function slugify(text: string) {
 		return (text || '')
 			.toLowerCase()
 			.trim()
@@ -32,34 +32,43 @@ const { label = 'On this page' } = Astro.props;
 			.replace(/-+/g, '-');
 	}
 
-	/** @param {HTMLElement} el */
-	function ensureId(el) {
-		if (!el.id) {
-			el.id = slugify(el.textContent || '');
+	function ensureId(el: HTMLElement, usedIds: Set<string>) {
+		const baseId = el.id || slugify(el.textContent || '') || 'section';
+		let id = baseId;
+		let suffix = 1;
+
+		while (
+			usedIds.has(id) ||
+			(document.getElementById(id) !== null && document.getElementById(id) !== el)
+		) {
+			id = `${baseId}-${suffix}`;
+			suffix += 1;
 		}
-		return el.id;
+
+		el.id = id;
+		usedIds.add(id);
+		return id;
 	}
 
-	function buildTOC() {
-		/** @type {HTMLElement | null} */
-		const container = document.querySelector('.content');
-		/** @type {HTMLUListElement | null} */
-		const list = document.getElementById('toc-list');
-		const aside = document.querySelector('[data-post-toc]');
-		if (!container || !list) return;
+	function buildTOC(): HTMLElement[] {
+		const container = document.querySelector<HTMLElement>('.content');
+		const list = document.querySelector<HTMLUListElement>('#toc-list');
+		const aside = document.querySelector<HTMLElement>('[data-post-toc]');
+		if (!container || !list) return [];
 
-		const hs = Array.from(container.querySelectorAll('h2, h3, h4')).filter((h) =>
+		const hs = Array.from(container.querySelectorAll<HTMLElement>('h2, h3, h4')).filter((h) =>
 			levels.has(parseInt(h.tagName.substring(1), 10))
 		);
 
 		if (hs.length === 0) {
 			aside?.setAttribute('hidden', '');
-			return;
+			return [];
 		}
 
 		list.innerHTML = '';
+		const usedIds = new Set<string>();
 		hs.forEach((h) => {
-			const id = ensureId(h);
+			const id = ensureId(h, usedIds);
 			const level = h.tagName.toLowerCase();
 			const li = document.createElement('li');
 			li.className =
@@ -80,52 +89,128 @@ const { label = 'On this page' } = Astro.props;
 
 		// Smooth scroll and manual activation on click
 		list.addEventListener('click', (e) => {
-			const a = e.target.closest('a');
+			const a = e.target instanceof Element ? e.target.closest<HTMLAnchorElement>('a') : null;
 			if (!a) return;
 			e.preventDefault();
 			const targetId = (a.getAttribute('href') || '').replace('#', '');
 			const target = document.getElementById(targetId);
 			if (target) {
-				target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				navigationTargetId = targetId;
+				scheduleNavigationRelease();
+				const behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+					? 'auto'
+					: 'smooth';
+				target.scrollIntoView({ behavior, block: 'start' });
 				activateLink(targetId);
 				history.replaceState(null, '', `#${targetId}`);
 			}
 		});
+
+		return hs;
 	}
 
-	function activateLink(id) {
-		document.querySelectorAll('#toc-list a').forEach((a) => {
+	let activeId = '';
+	let navigationTargetId = '';
+	let navigationReleaseTimer = 0;
+	let activeCenterTimer = 0;
+	let pendingCenterLink: HTMLAnchorElement | null = null;
+	let refreshActiveHeading = () => {};
+
+	function scheduleNavigationRelease() {
+		window.clearTimeout(navigationReleaseTimer);
+		navigationReleaseTimer = window.setTimeout(() => {
+			navigationTargetId = '';
+			refreshActiveHeading();
+		}, 140);
+	}
+
+	function scheduleActiveCenter(link: HTMLAnchorElement, delay = 180) {
+		pendingCenterLink = link;
+		window.clearTimeout(activeCenterTimer);
+		activeCenterTimer = window.setTimeout(() => {
+			if (pendingCenterLink) centerActiveLink(pendingCenterLink);
+		}, delay);
+	}
+
+	function postponeActiveCenter() {
+		if (pendingCenterLink) scheduleActiveCenter(pendingCenterLink);
+	}
+
+	function centerActiveLink(link: HTMLAnchorElement) {
+		const scrollContainer = link.closest<HTMLElement>('[data-toc-scroll]');
+		if (!scrollContainer || scrollContainer.scrollHeight <= scrollContainer.clientHeight) return;
+
+		const targetTop =
+			link.offsetTop - (scrollContainer.clientHeight - link.offsetHeight) / 2;
+
+		scrollContainer.scrollTo({ top: targetTop, behavior: 'smooth' });
+	}
+
+	function activateLink(id: string) {
+		if (!id || id === activeId) return;
+		let activeLink: HTMLAnchorElement | null = null;
+		for (const a of document.querySelectorAll<HTMLAnchorElement>('#toc-list a')) {
 			const match = a.getAttribute('href') === `#${id}`;
 			a.classList.toggle('is-active', match);
 			if (match) {
 				a.setAttribute('aria-current', 'true');
+				activeLink = a;
 			} else {
 				a.removeAttribute('aria-current');
 			}
-		});
+		}
+
+		activeId = id;
+		if (activeLink) {
+			scheduleActiveCenter(activeLink);
+		}
 	}
 
-	function initScrollSpy() {
-		const container = document.querySelector('.content');
-		if (!container) return;
-		const headings = Array.from(container.querySelectorAll('h2, h3, h4'));
-		const observer = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((entry) => {
-					if (entry.isIntersecting) {
-						const id = entry.target.id;
-						if (id) activateLink(id);
+	function initScrollSpy(headings: HTMLElement[]) {
+		let scheduled = false;
+
+		function updateActiveHeading() {
+			scheduled = false;
+			const marker = Math.min(window.innerHeight * 0.32, 280);
+			let current = headings[0];
+			const atPageEnd =
+				window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+
+			if (atPageEnd) {
+				current = headings[headings.length - 1];
+			} else {
+				for (const heading of headings) {
+					if (heading.getBoundingClientRect().top <= marker) {
+						current = heading;
+					} else {
+						break;
 					}
-				});
-			},
-			{ rootMargin: '0px 0px -70% 0px', threshold: 0.1 }
-		);
-		headings.forEach((h) => observer.observe(h));
+				}
+			}
+
+			if (current?.id) activateLink(current.id);
+		}
+
+		function scheduleUpdate() {
+			postponeActiveCenter();
+			if (navigationTargetId) {
+				scheduleNavigationRelease();
+				return;
+			}
+			if (scheduled) return;
+			scheduled = true;
+			requestAnimationFrame(updateActiveHeading);
+		}
+
+		refreshActiveHeading = updateActiveHeading;
+		window.addEventListener('scroll', scheduleUpdate, { passive: true });
+		window.addEventListener('resize', scheduleUpdate, { passive: true });
+		updateActiveHeading();
 	}
 
 	function start() {
-		buildTOC();
-		initScrollSpy();
+		const headings = buildTOC();
+		if (headings.length > 0) initScrollSpy(headings);
 	}
 
 	if (document.readyState === 'loading') {
@@ -136,6 +221,36 @@ const { label = 'On this page' } = Astro.props;
 </script>
 
 <style is:global>
+	.toc {
+		--toc-panel-height: calc(100vh - 11.5rem);
+		display: flex;
+		max-height: var(--toc-panel-height);
+		min-height: 0;
+		flex-direction: column;
+	}
+
+	.toc-scroll {
+		position: relative;
+		min-height: 0;
+		overflow-y: auto;
+		overflow-anchor: none;
+		overscroll-behavior-y: contain;
+		padding: 0.15rem 0.2rem 0.15rem 0;
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+
+	.toc-scroll::after {
+		content: '';
+		display: block;
+		height: calc(var(--toc-panel-height) / 2);
+		pointer-events: none;
+	}
+
+	.toc-scroll::-webkit-scrollbar {
+		display: none;
+	}
+
 	.toc-link {
 		display: block;
 		margin-left: -1px;
@@ -145,6 +260,7 @@ const { label = 'On this page' } = Astro.props;
 		font-size: 0.78rem;
 		line-height: 1.45;
 		transition:
+			background-color 160ms ease,
 			border-color 160ms ease,
 			color 160ms ease,
 			transform 160ms ease;
@@ -157,7 +273,14 @@ const { label = 'On this page' } = Astro.props;
 	}
 
 	.toc-link.is-active {
+		background: linear-gradient(90deg, rgb(255 247 237 / 90%), transparent);
 		font-weight: 700;
+	}
+
+	.toc-link:focus-visible {
+		border-radius: 0 0.35rem 0.35rem 0;
+		outline: 2px solid rgb(249 115 22 / 65%);
+		outline-offset: -2px;
 	}
 
 	.toc-item-nested .toc-link {
@@ -179,5 +302,9 @@ const { label = 'On this page' } = Astro.props;
 	.dark .toc-link:hover,
 	.dark .toc-link.is-active {
 		color: rgb(251 146 60);
+	}
+
+	.dark .toc-link.is-active {
+		background: linear-gradient(90deg, rgb(124 45 18 / 22%), transparent);
 	}
 </style>
